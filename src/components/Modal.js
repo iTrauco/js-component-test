@@ -1,4 +1,4 @@
-export function showModal(message) { // time:2025-04-18T16:17:35.617Z line:1 uuid:0960f286
-  alert(message); // time:2025-04-18T16:17:35.617Z line:2 uuid:56c197c8
-} // time:2025-04-18T16:17:35.617Z line:3 uuid:92b08942
-// time:2025-04-18T16:17:35.617Z line:4 uuid:13ad14a1
+export function showModal(message) { // time:2025-04-18T16:18:04.423Z line:1 uuid:5e0f3ee3
+  alert(message); // time:2025-04-18T16:18:04.423Z line:2 uuid:d5906f53
+} // time:2025-04-18T16:18:04.423Z line:3 uuid:b71162f0
+// time:2025-04-18T16:18:04.423Z line:4 uuid:f27c813c

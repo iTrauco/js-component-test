@@ -3,7 +3,7 @@
     "includeBranch": false,
     "includeCommit": false,
     "includeTimestamp": false,
-    "includeLineNumber": false,
+    "includeLineNumber": true,
     "excludeDirs": [
       "node_modules",
       "dist",
@@ -14,7 +14,36 @@
     ]
   },
   "lastRun": {
-    "timestamp": 1744998161770,
-    "files": []
+    "timestamp": 1744999103282,
+    "files": [
+      {
+        "relativePath": "server/server.js",
+        "backupPath": ".uuid-cli-backups/server.js.1744999103195.bak"
+      },
+      {
+        "relativePath": "src/components/Button.js",
+        "backupPath": ".uuid-cli-backups/Button.js.1744999103211.bak"
+      },
+      {
+        "relativePath": "src/components/Modal.js",
+        "backupPath": ".uuid-cli-backups/Modal.js.1744999103225.bak"
+      },
+      {
+        "relativePath": "src/components/Tooltip.js",
+        "backupPath": ".uuid-cli-backups/Tooltip.js.1744999103240.bak"
+      },
+      {
+        "relativePath": "src/main.js",
+        "backupPath": ".uuid-cli-backups/main.js.1744999103250.bak"
+      },
+      {
+        "relativePath": "src/utils/domUtils.js",
+        "backupPath": ".uuid-cli-backups/domUtils.js.1744999103259.bak"
+      },
+      {
+        "relativePath": "src/utils/eventBus.js",
+        "backupPath": ".uuid-cli-backups/eventBus.js.1744999103271.bak"
+      }
+    ]
   }
 }

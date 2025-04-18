@@ -1,0 +1,10 @@
+import { getById } from './utils/domUtils.js'; // uuid:32151513
+import { showModal } from './components/Modal.js'; // uuid:07670cd8
+// uuid:978e0dc9
+document.addEventListener('DOMContentLoaded', () => { // uuid:83ef724b
+  const btn = getById('test-btn'); // uuid:cd9161ca
+  btn.addEventListener('click', () => { // uuid:a41e10ec
+    showModal('Modal opened by Button!'); // uuid:28c58542
+  }); // uuid:4e38f2c5
+}); // uuid:8074aae4
+// uuid:ff3aa98b

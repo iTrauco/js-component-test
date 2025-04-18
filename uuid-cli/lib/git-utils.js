@@ -1,106 +1,64 @@
-// lib/config.js
-const fs = require('fs');
-const path = require('path');
+// lib/git-utils.js
+const { execSync } = require('child_process');
 
-const CONFIG_FILE = '.uuid-cli-config.json';
-const BACKUP_DIR = '.uuid-cli-backups';
-const SKIP_DIRS = ['node_modules', 'dist', 'build', '.git', 'coverage', BACKUP_DIR];
-
-// Default configuration
-const defaultConfig = {
-  includeBranch: true,
-  includeCommit: true,
-  includeTimestamp: true,
-  includeLineNumber: true,
-  excludeDirs: [...SKIP_DIRS]
-};
-
-let config = { ...defaultConfig };
-let lastRunInfo = {
-  timestamp: null,
-  files: []
-};
-
-function loadConfig() {
+/**
+ * Gets Git information from the current repository
+ * @returns {Object} Object containing branch and lastCommit information
+ */
+function getGitInfo() {
   try {
-    if (fs.existsSync(CONFIG_FILE)) {
-      const fileContent = fs.readFileSync(CONFIG_FILE, 'utf8');
-      const data = JSON.parse(fileContent);
-      
-      // Load config
-      if (data.config) {
-        config = data.config;
-      }
-      
-      // Load last run info
-      if (data.lastRun) {
-        lastRunInfo = data.lastRun;
-      }
-      
-      // Initialize excludeDirs if undefined
-      if (!config.excludeDirs) {
-        config.excludeDirs = [...SKIP_DIRS];
-      }
-      
-      console.log('Loaded configuration:', config);
-    }
-  } catch (error) {
-    console.error('Error loading config:', error.message);
-  }
-}
-
-function saveConfig() {
-  try {
-    // Save both config and last run info
-    const data = {
-      config,
-      lastRun: lastRunInfo
-    };
+    execSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' });
+    let branch = null;
     
-    fs.writeFileSync(CONFIG_FILE, JSON.stringify(data, null, 2));
-    console.log('Configuration saved.');
+    // Method 1: Try symbolic-ref HEAD
+    try {
+      branch = execSync('git symbolic-ref --short HEAD', { encoding: 'utf8' }).trim();
+    } catch (e) {
+      console.log('Could not get branch via symbolic-ref:', e.message);
+    }
+    
+    // Method 2: Try git status if still null
+    if (!branch) {
+      try {
+        const gitStatusOutput = execSync('git status', { encoding: 'utf8' });
+        const branchMatch = gitStatusOutput.match(/On branch ([^\s]+)/);
+        if (branchMatch && branchMatch[1]) {
+          branch = branchMatch[1];
+        }
+      } catch (e) {
+        console.log('Could not get branch via git status:', e.message);
+      }
+    }
+    
+    // Method 3: Try environment variables if still null
+    if (!branch) {
+      if (process.env.BRANCH_NAME) {
+        branch = process.env.BRANCH_NAME;
+      } else if (process.env.GIT_BRANCH) {
+        branch = process.env.GIT_BRANCH;
+      }
+    }
+    
+    // Method 4: Last attempt with show-current
+    if (!branch) {
+      try {
+        branch = execSync('git branch --show-current', { encoding: 'utf8' }).trim();
+      } catch (e) {
+        console.log('Could not get branch via show-current:', e.message);
+      }
+    }
+    
+    // Get commit info
+    const lastCommit = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
+    
+    console.log('Debug - Detected Git Info:', { branch, lastCommit });
+    return { branch, lastCommit };
   } catch (error) {
-    console.error('Error saving config:', error.message);
+    console.log('Git info detection error:', error.message);
+    return { branch: null, lastCommit: null };
   }
-}
-
-function resetConfig() {
-  config = { ...defaultConfig };
-  return config;
-}
-
-function getConfig() {
-  return config;
-}
-
-function updateConfig(newConfig) {
-  config = { ...newConfig };
-}
-
-function getLastRunInfo() {
-  return lastRunInfo;
-}
-
-function updateLastRunInfo(newInfo) {
-  lastRunInfo = { ...newInfo };
-  saveConfig();
-}
-
-function getConstants() {
-  return {
-    CONFIG_FILE,
-    BACKUP_DIR,
-    SKIP_DIRS
-  };
 }
 
 module.exports = {
-  loadConfig,
-  saveConfig,
-  resetConfig,
-  getConfig,
-  updateConfig,
-  getLastRunInfo,
-  updateLastRunInfo,
-  getConstants
+  getGitInfo
 };

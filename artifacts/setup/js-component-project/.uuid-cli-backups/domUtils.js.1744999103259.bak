@@ -1,0 +1,4 @@
+export function getById(id) { // uuid:6d6fe026
+  return document.getElementById(id); // uuid:19ffca85
+} // uuid:0c3b6351
+// uuid:44cbf720

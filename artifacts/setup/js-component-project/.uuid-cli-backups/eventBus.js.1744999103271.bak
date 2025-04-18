@@ -1,0 +1,11 @@
+const listeners = {}; // uuid:a61d1b45
+// uuid:b7229c6c
+export const eventBus = { // uuid:d7241053
+  on(event, callback) { // uuid:5192ab0d
+    (listeners[event] ||= []).push(callback); // uuid:7b3b06f8
+  }, // uuid:29f0469b
+  emit(event, data) { // uuid:ecb6723f
+    (listeners[event] || []).forEach(cb => cb(data)); // uuid:c4a5cf0a
+  } // uuid:cfd0eaf0
+}; // uuid:03e150ac
+// uuid:dd780811

@@ -1,0 +1,12 @@
+const express = require('express'); // uuid:3dae7cdc
+const path = require('path'); // uuid:e5efd338
+const app = express(); // uuid:06ed7627
+const PORT = 3000; // uuid:47d9ea65
+// uuid:a46aeb99
+app.use(express.static(path.join(__dirname, '../public'))); // uuid:21aee3f8
+app.use(express.static(path.join(__dirname, '../src'))); // uuid:d2438594
+// uuid:8743bda6
+app.listen(PORT, () => { // uuid:d91376ee
+  console.log(`🚀 Server running at http://localhost:${PORT}`); // uuid:7d0699ee
+}); // uuid:3295c6ce
+// uuid:838433d1

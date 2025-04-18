@@ -1,0 +1,20 @@
+{
+  "config": {
+    "includeBranch": true,
+    "includeCommit": true,
+    "includeTimestamp": true,
+    "includeLineNumber": true,
+    "excludeDirs": [
+      "node_modules",
+      "dist",
+      "build",
+      ".git",
+      "coverage",
+      ".uuid-cli-backups"
+    ]
+  },
+  "lastRun": {
+    "timestamp": 1744998056855,
+    "files": []
+  }
+}

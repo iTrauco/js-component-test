@@ -1,0 +1,344 @@
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:1 uuid:4093ce33
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:2 uuid:9fddec53
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:3 uuid:2ceba9e6
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:4 uuid:ae631426
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:5 uuid:923c67ce
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:6 uuid:deadf501
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:7 uuid:6f5a0443
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:8 uuid:1ddda18e
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:9 uuid:f7eb4c1c
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:10 uuid:a7fb7035
+const fs = require('fs'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:11 uuid:9a3c934d
+const path = require('path'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:12 uuid:1b85e071
+const crypto = require('crypto'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:13 uuid:8c32c474
+const { execSync } = require('child_process'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:14 uuid:8364e715
+const readline = require('readline'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:15 uuid:09ee5148
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:16 uuid:3b7dc717
+const CONFIG_FILE = '.uuid-cli-config.json'; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:17 uuid:22428501
+const BACKUP_DIR = '.uuid-cli-backups'; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:18 uuid:9bba3083
+const SCRIPT_FILENAME = path.basename(__filename); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:19 uuid:8cc6e328
+const SKIP_DIRS = ['node_modules', 'dist', 'build', '.git', 'coverage', BACKUP_DIR]; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:20 uuid:b31153ce
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:21 uuid:50d62d88
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:22 uuid:7ab8dc15
+let config = { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:23 uuid:3217fdd7
+  includeBranch: true, // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:24 uuid:f39a1465
+  includeCommit: true, // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:25 uuid:500aff15
+  includeTimestamp: true, // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:26 uuid:5337fdfa
+  includeLineNumber: true // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:27 uuid:d1de1c54
+}; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:28 uuid:cadee10b
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:29 uuid:4a2a0ca9
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:30 uuid:a14cd1ef
+let lastRunInfo = { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:31 uuid:a72017ec
+  timestamp: null, // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:32 uuid:9265214f
+  files: [] // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:33 uuid:34f0b8d8
+}; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:34 uuid:fcfa89d9
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:35 uuid:697fd6a3
+function generateShortUUID() { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:36 uuid:696c8253
+  return crypto.randomBytes(4).toString('hex'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:37 uuid:e67be950
+} // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:38 uuid:01b3f146
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:39 uuid:6b3f3103
+function getGitInfo() { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:40 uuid:e17c9c47
+  try { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:41 uuid:7d79c54d
+    execSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' }); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:42 uuid:d14fc82e
+    let branch; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:43 uuid:253d18c5
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:44 uuid:be7d2fa8
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:45 uuid:5f815834
+    if (process.env.BRANCH_NAME) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:46 uuid:6cade00d
+      branch = process.env.BRANCH_NAME; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:47 uuid:61b21efe
+    } else if (process.env.GIT_BRANCH) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:48 uuid:b828f7e0
+      branch = process.env.GIT_BRANCH; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:49 uuid:eb4c54fd
+    } else { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:50 uuid:92bdc3de
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:51 uuid:ebaf1ed3
+      branch = execSync('git branch --show-current', { encoding: 'utf8' }).trim(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:52 uuid:dc8eb090
+    } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:53 uuid:40538a0a
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:54 uuid:2e81aed1
+    const lastCommit = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:55 uuid:5b6e5e26
+    return { branch, lastCommit }; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:56 uuid:a96cfa4c
+  } catch (error) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:57 uuid:7c4fa170
+    console.log('Git info detection error:', error.message); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:58 uuid:a2d0e7a1
+    return { branch: null, lastCommit: null }; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:59 uuid:be341f27
+  } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:60 uuid:cbfbd952
+} // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:61 uuid:fe4b0b58
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:62 uuid:2146b14a
+function loadConfig() { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:63 uuid:a06e86b0
+  try { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:64 uuid:607dbbc4
+    if (fs.existsSync(CONFIG_FILE)) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:65 uuid:53f0d66c
+      const fileContent = fs.readFileSync(CONFIG_FILE, 'utf8'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:66 uuid:6fd729fc
+      const data = JSON.parse(fileContent); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:67 uuid:8d8c4620
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:68 uuid:b7c82916
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:69 uuid:5c836848
+      if (data.config) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:70 uuid:2c41eec9
+        config = data.config; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:71 uuid:2ad5b718
+      } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:72 uuid:5463097f
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:73 uuid:75bf2065
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:74 uuid:41338627
+      if (data.lastRun) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:75 uuid:df983488
+        lastRunInfo = data.lastRun; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:76 uuid:687da145
+      } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:77 uuid:ff1ad70e
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:78 uuid:6e05d411
+      console.log('Loaded configuration:', config); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:79 uuid:c02ed10e
+    } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:80 uuid:0fac5067
+  } catch (error) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:81 uuid:e724aa04
+    console.error('Error loading config:', error.message); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:82 uuid:5387ffb5
+  } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:83 uuid:8e98318e
+} // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:84 uuid:ae7c06c7
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:85 uuid:f7939d2c
+function saveConfig() { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:86 uuid:593ae2a5
+  try { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:87 uuid:d21e8cb8
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:88 uuid:8d75e3fa
+    const data = { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:89 uuid:89ce3f15
+      config, // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:90 uuid:1fe5f697
+      lastRun: lastRunInfo // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:91 uuid:f8666124
+    }; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:92 uuid:c9bc2627
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:93 uuid:4fab6d48
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(data, null, 2)); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:94 uuid:8bb15ee9
+    console.log('Configuration saved.'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:95 uuid:67a66d19
+  } catch (error) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:96 uuid:fbbb2d38
+    console.error('Error saving config:', error.message); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:97 uuid:05b8c41b
+  } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:98 uuid:4ffa1259
+} // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:99 uuid:39a5729f
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:100 uuid:914c3282
+function ensureBackupDir() { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:101 uuid:96655f59
+  if (!fs.existsSync(BACKUP_DIR)) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:102 uuid:277841db
+    fs.mkdirSync(BACKUP_DIR, { recursive: true }); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:103 uuid:6c880c03
+    console.log(`Created backup directory: ${BACKUP_DIR}`); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:104 uuid:9e8d81c5
+  } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:105 uuid:e2905976
+} // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:106 uuid:db5555ad
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:107 uuid:b5a95ba5
+function backupFile(filePath) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:108 uuid:2690cf85
+  try { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:109 uuid:f940ea17
+    ensureBackupDir(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:110 uuid:54d5b309
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:111 uuid:848596f4
+    const content = fs.readFileSync(filePath, 'utf8'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:112 uuid:e36436ec
+    const fileName = path.basename(filePath); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:113 uuid:7fd7dd30
+    const relativePath = path.relative(process.cwd(), filePath); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:114 uuid:c07b04de
+    const backupPath = path.join(BACKUP_DIR, `${fileName}.${Date.now()}.bak`); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:115 uuid:4ef1d145
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:116 uuid:cd1ff9dc
+    fs.writeFileSync(backupPath, content); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:117 uuid:e98d408f
+    return { relativePath, backupPath }; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:118 uuid:fbf56a64
+  } catch (error) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:119 uuid:b4909cdb
+    console.error(`Error backing up ${filePath}: ${error.message}`); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:120 uuid:76d07359
+    return null; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:121 uuid:4ca1cd86
+  } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:122 uuid:43a1e85e
+} // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:123 uuid:408d7c50
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:124 uuid:15c9ce9e
+function addUUIDsToFile(filePath) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:125 uuid:e66d6626
+  try { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:126 uuid:bd74df64
+    if (path.basename(filePath) === SCRIPT_FILENAME) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:127 uuid:f1b3958f
+      console.log(`Skipping self: ${filePath}`); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:128 uuid:3fadb21e
+      return null; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:129 uuid:16f5ee39
+    } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:130 uuid:4b8d85f5
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:131 uuid:ff6df717
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:132 uuid:3b59b0e5
+    const backup = backupFile(filePath); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:133 uuid:4a594a17
+    if (!backup) return null; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:134 uuid:2bb496a9
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:135 uuid:b493c102
+    const { branch, lastCommit } = getGitInfo(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:136 uuid:d8daa2df
+    const timestamp = new Date().toISOString(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:137 uuid:12e90587
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:138 uuid:c6501175
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:139 uuid:e75f58d8
+    let metaParts = []; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:140 uuid:95114d22
+    if (config.includeBranch && branch) metaParts.push(branch); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:141 uuid:a33b442f
+    if (config.includeCommit && lastCommit) metaParts.push(lastCommit); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:142 uuid:811605bb
+    if (config.includeTimestamp) metaParts.push(timestamp); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:143 uuid:1e1f67c6
+    const metaInfo = metaParts.join('|'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:144 uuid:b3887b69
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:145 uuid:38cdc650
+    let content = fs.readFileSync(filePath, 'utf8'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:146 uuid:c056b630
+    const lines = content.split('\n'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:147 uuid:32871e2a
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:148 uuid:9c04357b
+    const updatedLines = lines.map((line, index) => { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:149 uuid:c12c4a42
+      const lineNumber = index + 1; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:150 uuid:112e1187
+      let cleanLine = line; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:151 uuid:da93eefe
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:152 uuid:f1442e50
+      if (line.includes(' // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:153 uuid:45722edd
+        cleanLine = line.substring(0, line.indexOf(' // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:154 uuid:257db8c7
+      } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:155 uuid:74959c8f
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:156 uuid:9cedd96b
+      let comment = ' // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:157 uuid:0c231e84
+      if (metaInfo) comment += `${metaInfo} `; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:158 uuid:d5e90898
+      if (config.includeLineNumber) comment += `line:${lineNumber} `; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:159 uuid:08fe673c
+      comment += `uuid:${generateShortUUID()}`; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:160 uuid:dfe3501d
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:161 uuid:9e77fdb7
+      if (cleanLine.trim() === '') { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:162 uuid:f8aae4c0
+        return comment.trim(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:163 uuid:72034e9a
+      } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:164 uuid:12b2f8ee
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:165 uuid:3a1ee906
+      return `${cleanLine.trimEnd()}${comment}`; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:166 uuid:dbfe5007
+    }); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:167 uuid:a6420d78
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:168 uuid:7a7b11a2
+    fs.writeFileSync(filePath, updatedLines.join('\n')); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:169 uuid:74e9e98c
+    console.log(`Updated: ${filePath}`); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:170 uuid:4ee9cb23
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:171 uuid:bde5cea1
+    return backup; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:172 uuid:379a2671
+  } catch (error) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:173 uuid:7aecb76f
+    console.error(`Error processing ${filePath}: ${error.message}`); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:174 uuid:635d0d4e
+    return null; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:175 uuid:ffebdf87
+  } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:176 uuid:5b65063e
+} // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:177 uuid:3ab244ef
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:178 uuid:2424f82f
+function processDirectory(dirPath) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:179 uuid:cb33c9da
+  const modifiedFiles = []; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:180 uuid:3aaa61d3
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true }); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:181 uuid:209bc9f5
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:182 uuid:5bf5fa1a
+  for (const entry of entries) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:183 uuid:bfa96268
+    const fullPath = path.join(dirPath, entry.name); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:184 uuid:22cc030f
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:185 uuid:709e0be7
+    if (entry.isDirectory()) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:186 uuid:d7be0b38
+      if (!SKIP_DIRS.includes(entry.name)) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:187 uuid:1ba7595f
+        const subDirResults = processDirectory(fullPath); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:188 uuid:3c3f5dc9
+        modifiedFiles.push(...subDirResults); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:189 uuid:2219f42f
+      } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:190 uuid:bfd238e3
+    } else if (entry.isFile() && /\.js$/.test(entry.name)) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:191 uuid:108361c5
+      const result = addUUIDsToFile(fullPath); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:192 uuid:56d85437
+      if (result) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:193 uuid:d0dc1d5e
+        modifiedFiles.push(result); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:194 uuid:c28f607e
+      } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:195 uuid:cec27c40
+    } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:196 uuid:3e85ab74
+  } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:197 uuid:a665b6e1
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:198 uuid:5d594ad6
+  return modifiedFiles; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:199 uuid:e86a3b4c
+} // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:200 uuid:2b71c46d
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:201 uuid:63e2719b
+function rollbackLastRun() { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:202 uuid:bf5aef3b
+  if (!lastRunInfo.timestamp || lastRunInfo.files.length === 0) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:203 uuid:36b01be6
+    console.log('No previous run found to rollback.'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:204 uuid:d804ca71
+    return; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:205 uuid:23856ef8
+  } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:206 uuid:c795b082
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:207 uuid:df70b36d
+  console.log(`Rolling back run from ${new Date(lastRunInfo.timestamp).toLocaleString()}`); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:208 uuid:dc336e16
+  console.log(`Files to restore: ${lastRunInfo.files.length}`); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:209 uuid:32526be0
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:210 uuid:4f64e8a3
+  let successCount = 0; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:211 uuid:8865bdb2
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:212 uuid:b619a49a
+  for (const file of lastRunInfo.files) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:213 uuid:2350471e
+    try { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:214 uuid:a604c2ff
+      if (fs.existsSync(file.backupPath)) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:215 uuid:8251da1e
+        const backupContent = fs.readFileSync(file.backupPath, 'utf8'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:216 uuid:47477000
+        const targetPath = path.join(process.cwd(), file.relativePath); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:217 uuid:bac0240e
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:218 uuid:6dc70b48
+        fs.writeFileSync(targetPath, backupContent); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:219 uuid:bfce60e0
+        console.log(`Restored: ${file.relativePath}`); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:220 uuid:94867a59
+        successCount++; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:221 uuid:1d51093d
+      } else { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:222 uuid:91bd3dd9
+        console.error(`Backup not found: ${file.backupPath}`); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:223 uuid:a78fc9dd
+      } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:224 uuid:408c85c1
+    } catch (error) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:225 uuid:296e0298
+      console.error(`Error restoring ${file.relativePath}: ${error.message}`); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:226 uuid:fd1c23b3
+    } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:227 uuid:a8971a6b
+  } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:228 uuid:77bed7f1
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:229 uuid:94a04fb0
+  console.log(`Rollback completed. Restored ${successCount} of ${lastRunInfo.files.length} files.`); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:230 uuid:e0cb2c56
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:231 uuid:f59e683e
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:232 uuid:e87a9dbd
+  lastRunInfo = { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:233 uuid:04e9be9a
+    timestamp: null, // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:234 uuid:6edb7d8c
+    files: [] // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:235 uuid:4e490dab
+  }; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:236 uuid:4ce6721c
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:237 uuid:e6a1418f
+  saveConfig(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:238 uuid:0789025b
+} // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:239 uuid:6cfea95b
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:240 uuid:ef6ec35e
+function runUUIDProcess() { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:241 uuid:af92adea
+  const modifiedFiles = processDirectory(process.cwd()); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:242 uuid:70673a0c
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:243 uuid:b4140dfa
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:244 uuid:1b58f8b7
+  lastRunInfo = { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:245 uuid:8b96f8c2
+    timestamp: Date.now(), // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:246 uuid:2a5d3397
+    files: modifiedFiles // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:247 uuid:67c29c3b
+  }; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:248 uuid:037a6dab
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:249 uuid:ebe5f3c7
+  saveConfig(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:250 uuid:692b3164
+  console.log(`Run completed. Modified ${modifiedFiles.length} files.`); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:251 uuid:7949edbd
+} // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:252 uuid:9b9fed3d
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:253 uuid:29f544d1
+function showMenu() { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:254 uuid:dc80dc7f
+  const rl = readline.createInterface({ // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:255 uuid:4b9dd911
+    input: process.stdin, // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:256 uuid:153c48f6
+    output: process.stdout // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:257 uuid:9cbbec0c
+  }); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:258 uuid:fbdccc90
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:259 uuid:ec48f35b
+  console.log('\nUUID CLI Configuration:'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:260 uuid:a47d1660
+  console.log('1. Include Branch Name: ' + (config.includeBranch ? 'Yes' : 'No')); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:261 uuid:93d69450
+  console.log('2. Include Last Commit: ' + (config.includeCommit ? 'Yes' : 'No')); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:262 uuid:b7ccd2aa
+  console.log('3. Include Timestamp: ' + (config.includeTimestamp ? 'Yes' : 'No')); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:263 uuid:daf486cd
+  console.log('4. Include Line Numbers: ' + (config.includeLineNumber ? 'Yes' : 'No')); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:264 uuid:bf107a4f
+  console.log('5. Reset to Defaults'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:265 uuid:b97c1d70
+  console.log('6. Save and Run'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:266 uuid:9568246a
+  console.log('7. Rollback Last Run'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:267 uuid:409d77f7
+  console.log('8. Exit'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:268 uuid:e0af573f
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:269 uuid:d60f010c
+  rl.question('\nEnter option number: ', (answer) => { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:270 uuid:958609d1
+    switch(answer) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:271 uuid:8200cc59
+      case '1': // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:272 uuid:4188a529
+        config.includeBranch = !config.includeBranch; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:273 uuid:e8a47c97
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:274 uuid:2d8e573a
+        showMenu(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:275 uuid:5ce72f01
+        break; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:276 uuid:fce7fda9
+      case '2': // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:277 uuid:d7dbe267
+        config.includeCommit = !config.includeCommit; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:278 uuid:11b808d4
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:279 uuid:4e74cfe4
+        showMenu(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:280 uuid:23af7667
+        break; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:281 uuid:f13783f4
+      case '3': // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:282 uuid:446034b0
+        config.includeTimestamp = !config.includeTimestamp; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:283 uuid:8c22296c
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:284 uuid:acdbf99c
+        showMenu(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:285 uuid:58c98c82
+        break; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:286 uuid:532ab943
+      case '4': // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:287 uuid:2ad05c7c
+        config.includeLineNumber = !config.includeLineNumber; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:288 uuid:1935f463
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:289 uuid:a4acec01
+        showMenu(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:290 uuid:0bd07dc5
+        break; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:291 uuid:04068303
+      case '5': // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:292 uuid:48e2ec6a
+        config = { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:293 uuid:96faeb9d
+          includeBranch: true, // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:294 uuid:e828984e
+          includeCommit: true, // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:295 uuid:1a9eb46c
+          includeTimestamp: true, // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:296 uuid:4050025a
+          includeLineNumber: true // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:297 uuid:5d8cbfa6
+        }; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:298 uuid:45fa10f7
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:299 uuid:d5551a74
+        showMenu(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:300 uuid:6a299f1f
+        break; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:301 uuid:2eba0c0d
+      case '6': // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:302 uuid:f2bc2ef4
+        saveConfig(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:303 uuid:d20b6c1f
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:304 uuid:589f2c73
+        runUUIDProcess(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:305 uuid:9e1373a9
+        break; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:306 uuid:a82a00c6
+      case '7': // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:307 uuid:9ff476c3
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:308 uuid:e6f22dcd
+        rollbackLastRun(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:309 uuid:74444d21
+        showMenu(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:310 uuid:53e79025
+        break; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:311 uuid:14e08034
+      case '8': // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:312 uuid:8fcad19b
+        console.log('Exiting without changes.'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:313 uuid:953d70ff
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:314 uuid:ac792ebf
+        break; // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:315 uuid:04346067
+      default: // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:316 uuid:f3a99b95
+        console.log('Invalid option. Please try again.'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:317 uuid:f9d401fd
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:318 uuid:2d8f4fdc
+        showMenu(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:319 uuid:e385c911
+    } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:320 uuid:683c15b4
+  }); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:321 uuid:b86229ef
+} // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:322 uuid:721feca1
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:323 uuid:679285bc
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:324 uuid:5ec7c75b
+function main() { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:325 uuid:38bbc39b
+  loadConfig(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:326 uuid:47123d37
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:327 uuid:7b7826de
+  if (process.argv.length > 2) { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:328 uuid:e061309e
+    if (process.argv[2] === '--run') { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:329 uuid:dfd20b44
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:330 uuid:9dbeb411
+      runUUIDProcess(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:331 uuid:88e5f201
+    } else if (process.argv[2] === '--rollback') { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:332 uuid:e2e49386
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:333 uuid:720a2080
+      rollbackLastRun(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:334 uuid:aa7c0d05
+    } else { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:335 uuid:98a95319
+      console.log('Unknown command. Available commands: --run, --rollback'); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:336 uuid:cfc61579
+    } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:337 uuid:79ccc9a7
+  } else { // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:338 uuid:9798dec9
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:339 uuid:a966045a
+    showMenu(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:340 uuid:6d1c9a53
+  } // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:341 uuid:035ed795
+} // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:342 uuid:ea00e8b4
+// commit:5eff28d|time:2025-04-18T16:16:59.295Z line:343 uuid:d53ec606
+main(); // commit:5eff28d|time:2025-04-18T16:16:59.295Z line:344 uuid:5d95378c

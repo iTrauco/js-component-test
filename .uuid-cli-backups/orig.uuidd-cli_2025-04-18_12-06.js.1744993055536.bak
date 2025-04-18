@@ -1,0 +1,201 @@
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:1 uuid:49758ad3
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:2 uuid:08dcc539
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:3 uuid:1ee8ee33
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:4 uuid:adba18db
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:5 uuid:c82235ab
+#!/usr/bin/env node // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:6 uuid:47e1dcfe
+const fs = require('fs'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:7 uuid:d94aa1c0
+const path = require('path'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:8 uuid:bbe50fe5
+const crypto = require('crypto'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:9 uuid:a7dbf24d
+const { execSync } = require('child_process'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:10 uuid:766673b1
+const readline = require('readline'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:11 uuid:eeae9ed1
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:12 uuid:288de67c
+const CONFIG_FILE = '.uuid-cli-config.json'; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:13 uuid:b5575ae0
+const SCRIPT_FILENAME = path.basename(__filename); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:14 uuid:bd86f0ad
+const SKIP_DIRS = ['node_modules', 'dist', 'build', '.git', 'coverage']; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:15 uuid:5eccab4a
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:16 uuid:4524dea8
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:17 uuid:d8b8beb0
+let config = { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:18 uuid:c7bda757
+  includeBranch: true, // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:19 uuid:f0d6256c
+  includeCommit: true, // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:20 uuid:a150efe7
+  includeTimestamp: true, // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:21 uuid:dbfc4c5e
+  includeLineNumber: true // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:22 uuid:fd221ebe
+}; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:23 uuid:d85a69ff
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:24 uuid:d41173c8
+function generateShortUUID() { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:25 uuid:17ffbc04
+  return crypto.randomBytes(4).toString('hex'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:26 uuid:ce38eff8
+} // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:27 uuid:ee368769
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:28 uuid:13aa688a
+function getGitInfo() { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:29 uuid:566f6e0d
+  try { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:30 uuid:d4e45e00
+    execSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' }); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:31 uuid:5ce752dc
+    const branch = execSync('git branch --show-current', { encoding: 'utf8' }).trim(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:32 uuid:f202da23
+    const lastCommit = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:33 uuid:d4cd332d
+    return { branch, lastCommit }; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:34 uuid:2c7f457a
+  } catch { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:35 uuid:2806d28e
+    return { branch: null, lastCommit: null }; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:36 uuid:a7c6023a
+  } // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:37 uuid:0fd2bfe3
+} // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:38 uuid:d5cc71eb
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:39 uuid:609ac7c1
+function loadConfig() { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:40 uuid:96dd2871
+  try { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:41 uuid:0f2e590f
+    if (fs.existsSync(CONFIG_FILE)) { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:42 uuid:638a9e64
+      config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8')); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:43 uuid:ff16a06c
+      console.log('Loaded configuration:', config); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:44 uuid:c45cf849
+    } // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:45 uuid:425aab04
+  } catch (error) { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:46 uuid:0b0fb34a
+    console.error('Error loading config:', error.message); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:47 uuid:6eb3fbd8
+  } // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:48 uuid:26371c3a
+} // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:49 uuid:c418663f
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:50 uuid:4fd297e5
+function saveConfig() { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:51 uuid:19d97226
+  try { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:52 uuid:2bc65837
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2)); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:53 uuid:59caf2da
+    console.log('Configuration saved.'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:54 uuid:5613fc1d
+  } catch (error) { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:55 uuid:b93f41df
+    console.error('Error saving config:', error.message); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:56 uuid:34a0190a
+  } // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:57 uuid:8ff40082
+} // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:58 uuid:746ec220
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:59 uuid:a023e7e4
+function addUUIDsToFile(filePath) { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:60 uuid:ef9d96d9
+  try { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:61 uuid:2733d684
+    if (path.basename(filePath) === SCRIPT_FILENAME) { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:62 uuid:9be2338c
+      console.log(`Skipping self: ${filePath}`); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:63 uuid:e89f3364
+      return; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:64 uuid:dc35a76c
+    } // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:65 uuid:e24374b5
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:66 uuid:17d17425
+    const { branch, lastCommit } = getGitInfo(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:67 uuid:9425b8a1
+    const timestamp = new Date().toISOString(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:68 uuid:54aa3299
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:69 uuid:0d5ff0d9
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:70 uuid:62aa2fa8
+    let metaParts = []; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:71 uuid:9a9d6820
+    if (config.includeBranch && branch) metaParts.push(branch); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:72 uuid:9bfc7c20
+    if (config.includeCommit && lastCommit) metaParts.push(lastCommit); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:73 uuid:04a0a3fa
+    if (config.includeTimestamp) metaParts.push(timestamp); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:74 uuid:a5a291b8
+    const metaInfo = metaParts.join('|'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:75 uuid:79bf9426
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:76 uuid:e788bf25
+    let content = fs.readFileSync(filePath, 'utf8'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:77 uuid:4d80b09a
+    const lines = content.split('\n'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:78 uuid:67170c19
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:79 uuid:c1d09974
+    const updatedLines = lines.map((line, index) => { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:80 uuid:b9a3b4b6
+      const lineNumber = index + 1; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:81 uuid:3ab2d39f
+      let cleanLine = line; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:82 uuid:242c9ae8
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:83 uuid:160dad12
+      if (line.includes(' // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:84 uuid:3c8d3789
+        cleanLine = line.substring(0, line.indexOf(' // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:85 uuid:a56d7f4f
+      } // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:86 uuid:3c1be08e
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:87 uuid:d9ea4f1c
+      let comment = ' // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:88 uuid:5f7ac000
+      if (metaInfo) comment += `${metaInfo} `; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:89 uuid:8e04cab2
+      if (config.includeLineNumber) comment += `line:${lineNumber} `; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:90 uuid:d3d546ab
+      comment += `uuid:${generateShortUUID()}`; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:91 uuid:6cd89b23
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:92 uuid:8cf018c7
+      if (cleanLine.trim() === '') { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:93 uuid:3b6ba56a
+        return comment.trim(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:94 uuid:53f76938
+      } // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:95 uuid:b2355dc1
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:96 uuid:3fd3dc15
+      return `${cleanLine.trimEnd()}${comment}`; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:97 uuid:64ce0065
+    }); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:98 uuid:740db225
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:99 uuid:03905dd1
+    fs.writeFileSync(filePath, updatedLines.join('\n')); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:100 uuid:db26a958
+    console.log(`Updated: ${filePath}`); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:101 uuid:efa77cce
+  } catch (error) { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:102 uuid:c0423fc3
+    console.error(`Error processing ${filePath}: ${error.message}`); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:103 uuid:c0022412
+  } // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:104 uuid:5e866bfc
+} // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:105 uuid:98d8e64e
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:106 uuid:b1dadc63
+function processDirectory(dirPath) { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:107 uuid:68392446
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true }); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:108 uuid:e35bbf4c
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:109 uuid:cda70046
+  for (const entry of entries) { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:110 uuid:2e48cdd1
+    const fullPath = path.join(dirPath, entry.name); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:111 uuid:b0a98f27
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:112 uuid:da6f5ccd
+    if (entry.isDirectory()) { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:113 uuid:86337804
+      if (!SKIP_DIRS.includes(entry.name)) { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:114 uuid:64751802
+        processDirectory(fullPath); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:115 uuid:38b90262
+      } // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:116 uuid:e09fb4ae
+    } else if (entry.isFile() && /\.js$/.test(entry.name)) { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:117 uuid:7bfc825a
+      addUUIDsToFile(fullPath); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:118 uuid:12176b0f
+    } // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:119 uuid:faea018c
+  } // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:120 uuid:cec200f6
+} // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:121 uuid:05e5079a
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:122 uuid:8d357b5c
+function showMenu() { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:123 uuid:270d47d8
+  const rl = readline.createInterface({ // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:124 uuid:2752c033
+    input: process.stdin, // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:125 uuid:cbd61a79
+    output: process.stdout // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:126 uuid:b0cc3986
+  }); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:127 uuid:b74ea1e1
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:128 uuid:178e623e
+  console.log('\nUUID CLI Configuration:'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:129 uuid:6587b65f
+  console.log('1. Include Branch Name: ' + (config.includeBranch ? 'Yes' : 'No')); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:130 uuid:36814117
+  console.log('2. Include Last Commit: ' + (config.includeCommit ? 'Yes' : 'No')); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:131 uuid:cf64d682
+  console.log('3. Include Timestamp: ' + (config.includeTimestamp ? 'Yes' : 'No')); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:132 uuid:1f6ff5a5
+  console.log('4. Include Line Numbers: ' + (config.includeLineNumber ? 'Yes' : 'No')); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:133 uuid:5a782822
+  console.log('5. Reset to Defaults'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:134 uuid:157aff4c
+  console.log('6. Save and Run'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:135 uuid:829cda4c
+  console.log('7. Exit'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:136 uuid:56c70969
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:137 uuid:d5203b1d
+  rl.question('\nEnter option number: ', (answer) => { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:138 uuid:7c4c794e
+    switch(answer) { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:139 uuid:00722940
+      case '1': // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:140 uuid:9019e18a
+        config.includeBranch = !config.includeBranch; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:141 uuid:c00ab775
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:142 uuid:f27aa690
+        showMenu(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:143 uuid:37dfad2d
+        break; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:144 uuid:bb6666c3
+      case '2': // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:145 uuid:b2439493
+        config.includeCommit = !config.includeCommit; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:146 uuid:58c2f1c5
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:147 uuid:66dc83b9
+        showMenu(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:148 uuid:a268fe5c
+        break; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:149 uuid:5ca16f67
+      case '3': // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:150 uuid:9252e474
+        config.includeTimestamp = !config.includeTimestamp; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:151 uuid:073824dd
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:152 uuid:ac1a3f67
+        showMenu(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:153 uuid:bea83a9a
+        break; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:154 uuid:b84ca020
+      case '4': // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:155 uuid:067b5121
+        config.includeLineNumber = !config.includeLineNumber; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:156 uuid:25fa95bc
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:157 uuid:6d584912
+        showMenu(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:158 uuid:3d81a943
+        break; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:159 uuid:64dc81ab
+      case '5': // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:160 uuid:1d942cb4
+        config = { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:161 uuid:b33cf1c3
+          includeBranch: true, // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:162 uuid:09ea02c1
+          includeCommit: true, // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:163 uuid:eebc6d3e
+          includeTimestamp: true, // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:164 uuid:bb09db89
+          includeLineNumber: true // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:165 uuid:a902e15b
+        }; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:166 uuid:a949800d
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:167 uuid:4615e415
+        showMenu(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:168 uuid:f71c991c
+        break; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:169 uuid:d76a5aa3
+      case '6': // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:170 uuid:05a277ab
+        saveConfig(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:171 uuid:f66376c1
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:172 uuid:2efe0ae7
+        processDirectory(process.cwd()); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:173 uuid:7fc4550a
+        break; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:174 uuid:9ca3483c
+      case '7': // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:175 uuid:92e0522d
+        console.log('Exiting without changes.'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:176 uuid:c48fb912
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:177 uuid:32894b84
+        break; // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:178 uuid:ad6c2ab8
+      default: // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:179 uuid:2f5edefa
+        console.log('Invalid option. Please try again.'); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:180 uuid:6b769a52
+        rl.close(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:181 uuid:607ab9e8
+        showMenu(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:182 uuid:eb9522c1
+    } // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:183 uuid:ef3b01d7
+  }); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:184 uuid:6023e311
+} // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:185 uuid:6331258d
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:186 uuid:30dbe96b
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:187 uuid:f7c3a1df
+function main() { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:188 uuid:c5dfeff7
+  loadConfig(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:189 uuid:32a99efc
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:190 uuid:94eb98e4
+  if (process.argv.length > 2 && process.argv[2] === '--run') { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:191 uuid:a1dc9462
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:192 uuid:9ea63d65
+    processDirectory(process.cwd()); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:193 uuid:7bee8853
+  } else { // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:194 uuid:f386ddcc
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:195 uuid:c60de045
+    showMenu(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:196 uuid:beff6247
+  } // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:197 uuid:f02c5269
+} // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:198 uuid:afa81987
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:199 uuid:e365baac
+main(); // commit:5eff28d|time:2025-04-18T16:16:59.334Z line:200 uuid:5f3b8832
+// commit:5eff28d|time:2025-04-18T16:16:59.334Z line:201 uuid:0c8f4c45

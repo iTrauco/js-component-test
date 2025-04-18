@@ -1,344 +1,344 @@
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:1 uuid:048166ef
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:2 uuid:77fd57e3
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:3 uuid:22b538c4
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:4 uuid:b77e07fa
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:5 uuid:2637b2b9
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:6 uuid:a05a4e9f
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:7 uuid:ae4170d0
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:8 uuid:9f5cc7ff
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:9 uuid:fb376fa7
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:10 uuid:b26adf47
-const fs = require('fs'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:11 uuid:72a1a001
-const path = require('path'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:12 uuid:e1c6e963
-const crypto = require('crypto'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:13 uuid:daf97822
-const { execSync } = require('child_process'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:14 uuid:cf3ec166
-const readline = require('readline'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:15 uuid:72bc79d3
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:16 uuid:4cc4a858
-const CONFIG_FILE = '.uuid-cli-config.json'; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:17 uuid:9c64db49
-const BACKUP_DIR = '.uuid-cli-backups'; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:18 uuid:4a80957c
-const SCRIPT_FILENAME = path.basename(__filename); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:19 uuid:ca9199bd
-const SKIP_DIRS = ['node_modules', 'dist', 'build', '.git', 'coverage', BACKUP_DIR]; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:20 uuid:028d88a0
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:21 uuid:f08ea876
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:22 uuid:37552308
-let config = { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:23 uuid:ca5ae37d
-  includeBranch: true, // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:24 uuid:75362b92
-  includeCommit: true, // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:25 uuid:b4f6b326
-  includeTimestamp: true, // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:26 uuid:bf0de793
-  includeLineNumber: true // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:27 uuid:b0526b56
-}; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:28 uuid:9e5b3cda
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:29 uuid:5837485c
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:30 uuid:fa10e18e
-let lastRunInfo = { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:31 uuid:870ccd4d
-  timestamp: null, // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:32 uuid:9f42db6c
-  files: [] // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:33 uuid:6d05d915
-}; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:34 uuid:83aae268
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:35 uuid:57bf0609
-function generateShortUUID() { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:36 uuid:3322c40b
-  return crypto.randomBytes(4).toString('hex'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:37 uuid:0eb3c809
-} // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:38 uuid:76cf98bd
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:39 uuid:beb84f8c
-function getGitInfo() { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:40 uuid:78ba8853
-  try { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:41 uuid:53eafd71
-    execSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' }); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:42 uuid:bede1a9a
-    let branch; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:43 uuid:d2f02e57
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:44 uuid:b24a008d
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:45 uuid:6d4af9f5
-    if (process.env.BRANCH_NAME) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:46 uuid:c8dfc16f
-      branch = process.env.BRANCH_NAME; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:47 uuid:60907dcb
-    } else if (process.env.GIT_BRANCH) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:48 uuid:e120a9a0
-      branch = process.env.GIT_BRANCH; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:49 uuid:2e8b3f7f
-    } else { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:50 uuid:bd68f56f
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:51 uuid:84bb7ddf
-      branch = execSync('git branch --show-current', { encoding: 'utf8' }).trim(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:52 uuid:ba40799b
-    } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:53 uuid:7c5df415
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:54 uuid:fe4729a4
-    const lastCommit = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:55 uuid:9217db04
-    return { branch, lastCommit }; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:56 uuid:44521ae3
-  } catch (error) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:57 uuid:c1b321a1
-    console.log('Git info detection error:', error.message); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:58 uuid:beaf5388
-    return { branch: null, lastCommit: null }; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:59 uuid:c8c9b8cb
-  } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:60 uuid:cb2b714d
-} // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:61 uuid:4dd4e3ca
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:62 uuid:b24d0b2b
-function loadConfig() { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:63 uuid:d8d99504
-  try { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:64 uuid:e3d16d68
-    if (fs.existsSync(CONFIG_FILE)) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:65 uuid:984e2055
-      const fileContent = fs.readFileSync(CONFIG_FILE, 'utf8'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:66 uuid:459da9be
-      const data = JSON.parse(fileContent); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:67 uuid:11cb5cdb
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:68 uuid:66adab39
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:69 uuid:9c1a9e05
-      if (data.config) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:70 uuid:b886a1ed
-        config = data.config; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:71 uuid:1f6e7f75
-      } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:72 uuid:be1bbc3e
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:73 uuid:deb2666c
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:74 uuid:4226588b
-      if (data.lastRun) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:75 uuid:ddd12602
-        lastRunInfo = data.lastRun; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:76 uuid:a7e399a8
-      } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:77 uuid:c9e2d925
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:78 uuid:45240ef4
-      console.log('Loaded configuration:', config); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:79 uuid:949b8872
-    } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:80 uuid:ed8a53f8
-  } catch (error) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:81 uuid:244fefde
-    console.error('Error loading config:', error.message); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:82 uuid:8674ca37
-  } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:83 uuid:a0915ca0
-} // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:84 uuid:26807bc0
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:85 uuid:3f885154
-function saveConfig() { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:86 uuid:0ddc0e0d
-  try { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:87 uuid:29038cf9
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:88 uuid:d82d7ee2
-    const data = { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:89 uuid:c1b09dcd
-      config, // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:90 uuid:3e0be080
-      lastRun: lastRunInfo // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:91 uuid:0d3b6c3c
-    }; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:92 uuid:17b1958d
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:93 uuid:877dfb3b
-    fs.writeFileSync(CONFIG_FILE, JSON.stringify(data, null, 2)); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:94 uuid:725eb6c3
-    console.log('Configuration saved.'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:95 uuid:cc1582b3
-  } catch (error) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:96 uuid:22d3952d
-    console.error('Error saving config:', error.message); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:97 uuid:f6c84ba8
-  } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:98 uuid:4cced3f5
-} // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:99 uuid:8ab4b17b
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:100 uuid:5aa16f61
-function ensureBackupDir() { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:101 uuid:4c56de16
-  if (!fs.existsSync(BACKUP_DIR)) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:102 uuid:559a0850
-    fs.mkdirSync(BACKUP_DIR, { recursive: true }); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:103 uuid:a52f4b42
-    console.log(`Created backup directory: ${BACKUP_DIR}`); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:104 uuid:acc63b84
-  } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:105 uuid:21ba895b
-} // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:106 uuid:309dc575
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:107 uuid:fefa457f
-function backupFile(filePath) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:108 uuid:e505ace3
-  try { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:109 uuid:02afb3e9
-    ensureBackupDir(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:110 uuid:f4d5eadc
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:111 uuid:cdd5d00b
-    const content = fs.readFileSync(filePath, 'utf8'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:112 uuid:1740d816
-    const fileName = path.basename(filePath); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:113 uuid:85d5a9d5
-    const relativePath = path.relative(process.cwd(), filePath); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:114 uuid:619312bb
-    const backupPath = path.join(BACKUP_DIR, `${fileName}.${Date.now()}.bak`); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:115 uuid:9cdce426
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:116 uuid:54681822
-    fs.writeFileSync(backupPath, content); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:117 uuid:dee10430
-    return { relativePath, backupPath }; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:118 uuid:51f63f60
-  } catch (error) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:119 uuid:d783bd8a
-    console.error(`Error backing up ${filePath}: ${error.message}`); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:120 uuid:a415fc11
-    return null; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:121 uuid:169da5fe
-  } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:122 uuid:46cdac83
-} // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:123 uuid:933a9139
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:124 uuid:1caa44d0
-function addUUIDsToFile(filePath) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:125 uuid:39356e05
-  try { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:126 uuid:8590cf00
-    if (path.basename(filePath) === SCRIPT_FILENAME) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:127 uuid:87b5f8a3
-      console.log(`Skipping self: ${filePath}`); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:128 uuid:298713af
-      return null; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:129 uuid:5d53e594
-    } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:130 uuid:bde32f4a
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:131 uuid:9376ce75
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:132 uuid:c461d678
-    const backup = backupFile(filePath); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:133 uuid:facc86d1
-    if (!backup) return null; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:134 uuid:61c0ef22
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:135 uuid:68f1a64b
-    const { branch, lastCommit } = getGitInfo(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:136 uuid:531291a8
-    const timestamp = new Date().toISOString(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:137 uuid:c3babfa6
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:138 uuid:6e1362b0
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:139 uuid:f458511e
-    let metaParts = []; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:140 uuid:4cb05fd4
-    if (config.includeBranch && branch) metaParts.push(branch); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:141 uuid:1702833c
-    if (config.includeCommit && lastCommit) metaParts.push(lastCommit); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:142 uuid:bdf5898c
-    if (config.includeTimestamp) metaParts.push(timestamp); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:143 uuid:10aef11e
-    const metaInfo = metaParts.join('|'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:144 uuid:ae04074e
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:145 uuid:d6021dac
-    let content = fs.readFileSync(filePath, 'utf8'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:146 uuid:a6fd914e
-    const lines = content.split('\n'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:147 uuid:b9a3fa2e
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:148 uuid:2d01e5be
-    const updatedLines = lines.map((line, index) => { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:149 uuid:1f492536
-      const lineNumber = index + 1; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:150 uuid:40241e4b
-      let cleanLine = line; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:151 uuid:b8f4a15d
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:152 uuid:f1e3d75e
-      if (line.includes(' // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:153 uuid:1338a003
-        cleanLine = line.substring(0, line.indexOf(' // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:154 uuid:5301cc38
-      } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:155 uuid:fa858c79
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:156 uuid:b540d790
-      let comment = ' // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:157 uuid:01ee1ff2
-      if (metaInfo) comment += `${metaInfo} `; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:158 uuid:0f215d76
-      if (config.includeLineNumber) comment += `line:${lineNumber} `; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:159 uuid:0bd1e3ed
-      comment += `uuid:${generateShortUUID()}`; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:160 uuid:b6e8641a
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:161 uuid:8024a783
-      if (cleanLine.trim() === '') { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:162 uuid:92a01839
-        return comment.trim(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:163 uuid:4b2cde43
-      } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:164 uuid:a9a0a77f
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:165 uuid:3cebfd87
-      return `${cleanLine.trimEnd()}${comment}`; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:166 uuid:5af2c5bc
-    }); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:167 uuid:986fbb5b
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:168 uuid:a9e4754a
-    fs.writeFileSync(filePath, updatedLines.join('\n')); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:169 uuid:8bbbc1c8
-    console.log(`Updated: ${filePath}`); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:170 uuid:77cf81e5
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:171 uuid:8d619835
-    return backup; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:172 uuid:43e50e82
-  } catch (error) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:173 uuid:592281bc
-    console.error(`Error processing ${filePath}: ${error.message}`); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:174 uuid:4aed169f
-    return null; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:175 uuid:20e6ec7f
-  } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:176 uuid:77bf1eb3
-} // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:177 uuid:0f147c7e
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:178 uuid:623b67a2
-function processDirectory(dirPath) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:179 uuid:77a2c7d8
-  const modifiedFiles = []; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:180 uuid:acb5d18f
-  const entries = fs.readdirSync(dirPath, { withFileTypes: true }); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:181 uuid:32e4c3df
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:182 uuid:21f6d9b2
-  for (const entry of entries) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:183 uuid:e97bb8bc
-    const fullPath = path.join(dirPath, entry.name); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:184 uuid:58d16ef4
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:185 uuid:ec6ee867
-    if (entry.isDirectory()) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:186 uuid:6c1bf276
-      if (!SKIP_DIRS.includes(entry.name)) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:187 uuid:74c3fcd2
-        const subDirResults = processDirectory(fullPath); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:188 uuid:41c0759e
-        modifiedFiles.push(...subDirResults); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:189 uuid:3cd80858
-      } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:190 uuid:abf46543
-    } else if (entry.isFile() && /\.js$/.test(entry.name)) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:191 uuid:7b098795
-      const result = addUUIDsToFile(fullPath); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:192 uuid:56486d56
-      if (result) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:193 uuid:11630840
-        modifiedFiles.push(result); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:194 uuid:17ebe422
-      } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:195 uuid:c38f9de0
-    } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:196 uuid:ae4c5ae4
-  } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:197 uuid:5db8163a
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:198 uuid:783ec26a
-  return modifiedFiles; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:199 uuid:abf7510f
-} // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:200 uuid:4ca1c3c5
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:201 uuid:49498e8a
-function rollbackLastRun() { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:202 uuid:0f1d6233
-  if (!lastRunInfo.timestamp || lastRunInfo.files.length === 0) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:203 uuid:484f5f8e
-    console.log('No previous run found to rollback.'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:204 uuid:ede501e5
-    return; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:205 uuid:bd5fc00b
-  } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:206 uuid:d7832556
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:207 uuid:2c157847
-  console.log(`Rolling back run from ${new Date(lastRunInfo.timestamp).toLocaleString()}`); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:208 uuid:00a71848
-  console.log(`Files to restore: ${lastRunInfo.files.length}`); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:209 uuid:65fbdd43
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:210 uuid:41469430
-  let successCount = 0; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:211 uuid:a8a27e80
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:212 uuid:fbd8f281
-  for (const file of lastRunInfo.files) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:213 uuid:649f0d94
-    try { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:214 uuid:af6b3e0c
-      if (fs.existsSync(file.backupPath)) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:215 uuid:626a764a
-        const backupContent = fs.readFileSync(file.backupPath, 'utf8'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:216 uuid:beeb553f
-        const targetPath = path.join(process.cwd(), file.relativePath); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:217 uuid:4c8aceb2
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:218 uuid:7c678258
-        fs.writeFileSync(targetPath, backupContent); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:219 uuid:b66b795c
-        console.log(`Restored: ${file.relativePath}`); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:220 uuid:9045cb6d
-        successCount++; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:221 uuid:eca19b32
-      } else { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:222 uuid:d65cdd45
-        console.error(`Backup not found: ${file.backupPath}`); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:223 uuid:92548469
-      } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:224 uuid:6134b4b2
-    } catch (error) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:225 uuid:691b70ae
-      console.error(`Error restoring ${file.relativePath}: ${error.message}`); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:226 uuid:7367a3c8
-    } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:227 uuid:54103186
-  } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:228 uuid:6578ce38
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:229 uuid:217c8396
-  console.log(`Rollback completed. Restored ${successCount} of ${lastRunInfo.files.length} files.`); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:230 uuid:5c2c6187
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:231 uuid:f3b80173
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:232 uuid:672cbb14
-  lastRunInfo = { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:233 uuid:c8f0a928
-    timestamp: null, // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:234 uuid:561f6d53
-    files: [] // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:235 uuid:0fb0365a
-  }; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:236 uuid:de36c82f
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:237 uuid:246ec752
-  saveConfig(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:238 uuid:76b842f0
-} // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:239 uuid:1a7dcca3
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:240 uuid:42ff6413
-function runUUIDProcess() { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:241 uuid:0dbaf092
-  const modifiedFiles = processDirectory(process.cwd()); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:242 uuid:da90ecf9
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:243 uuid:a84b4912
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:244 uuid:7991b650
-  lastRunInfo = { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:245 uuid:df42bb10
-    timestamp: Date.now(), // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:246 uuid:c8641e53
-    files: modifiedFiles // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:247 uuid:19354084
-  }; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:248 uuid:151dc2de
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:249 uuid:25206a64
-  saveConfig(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:250 uuid:5990c486
-  console.log(`Run completed. Modified ${modifiedFiles.length} files.`); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:251 uuid:0955583a
-} // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:252 uuid:f61a32d5
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:253 uuid:0bf5b10e
-function showMenu() { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:254 uuid:2f10d869
-  const rl = readline.createInterface({ // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:255 uuid:74ba975c
-    input: process.stdin, // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:256 uuid:e0097906
-    output: process.stdout // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:257 uuid:79f1c520
-  }); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:258 uuid:78c14427
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:259 uuid:627b0e0e
-  console.log('\nUUID CLI Configuration:'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:260 uuid:47f7ce2c
-  console.log('1. Include Branch Name: ' + (config.includeBranch ? 'Yes' : 'No')); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:261 uuid:bbc9f7fc
-  console.log('2. Include Last Commit: ' + (config.includeCommit ? 'Yes' : 'No')); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:262 uuid:03da7306
-  console.log('3. Include Timestamp: ' + (config.includeTimestamp ? 'Yes' : 'No')); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:263 uuid:d7afbd9a
-  console.log('4. Include Line Numbers: ' + (config.includeLineNumber ? 'Yes' : 'No')); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:264 uuid:d966acd7
-  console.log('5. Reset to Defaults'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:265 uuid:ad2ab922
-  console.log('6. Save and Run'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:266 uuid:1bc058ac
-  console.log('7. Rollback Last Run'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:267 uuid:d279c382
-  console.log('8. Exit'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:268 uuid:17677644
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:269 uuid:0ce39b3a
-  rl.question('\nEnter option number: ', (answer) => { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:270 uuid:de548a78
-    switch(answer) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:271 uuid:45cec504
-      case '1': // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:272 uuid:c56f8a8d
-        config.includeBranch = !config.includeBranch; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:273 uuid:31e057b4
-        rl.close(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:274 uuid:6bf4f0ed
-        showMenu(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:275 uuid:f3ed06e5
-        break; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:276 uuid:dde14230
-      case '2': // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:277 uuid:e8b9d0ba
-        config.includeCommit = !config.includeCommit; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:278 uuid:277e66c3
-        rl.close(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:279 uuid:01f253d6
-        showMenu(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:280 uuid:4061ac5f
-        break; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:281 uuid:195de8c5
-      case '3': // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:282 uuid:bf965a1b
-        config.includeTimestamp = !config.includeTimestamp; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:283 uuid:a6fa8119
-        rl.close(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:284 uuid:58599a5a
-        showMenu(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:285 uuid:f2f1d1e4
-        break; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:286 uuid:f4b0d186
-      case '4': // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:287 uuid:091fa9d7
-        config.includeLineNumber = !config.includeLineNumber; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:288 uuid:d1e4d35d
-        rl.close(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:289 uuid:ef32950a
-        showMenu(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:290 uuid:3a40c4ed
-        break; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:291 uuid:ac9b48ae
-      case '5': // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:292 uuid:a31260f9
-        config = { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:293 uuid:7fc5f823
-          includeBranch: true, // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:294 uuid:2c454f42
-          includeCommit: true, // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:295 uuid:fb60e4e5
-          includeTimestamp: true, // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:296 uuid:c71c5030
-          includeLineNumber: true // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:297 uuid:6d801b14
-        }; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:298 uuid:0cbcfa86
-        rl.close(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:299 uuid:ce25b541
-        showMenu(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:300 uuid:dfb1cfef
-        break; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:301 uuid:a8b54a31
-      case '6': // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:302 uuid:24aabc9d
-        saveConfig(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:303 uuid:7201675c
-        rl.close(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:304 uuid:34d323b5
-        runUUIDProcess(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:305 uuid:689aa5e7
-        break; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:306 uuid:3f1fa44d
-      case '7': // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:307 uuid:312539c6
-        rl.close(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:308 uuid:c0e5ca7b
-        rollbackLastRun(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:309 uuid:7b8b6fbd
-        showMenu(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:310 uuid:7b07cc46
-        break; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:311 uuid:076a6245
-      case '8': // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:312 uuid:e4998862
-        console.log('Exiting without changes.'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:313 uuid:ec82f617
-        rl.close(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:314 uuid:65e5ca12
-        break; // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:315 uuid:c6f27b18
-      default: // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:316 uuid:d9ac1f12
-        console.log('Invalid option. Please try again.'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:317 uuid:3b72be94
-        rl.close(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:318 uuid:3b53c697
-        showMenu(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:319 uuid:bedf99de
-    } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:320 uuid:0a264c23
-  }); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:321 uuid:613c8d33
-} // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:322 uuid:335ab6e3
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:323 uuid:5acaae0a
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:324 uuid:5148a1c5
-function main() { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:325 uuid:ab6e4d4d
-  loadConfig(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:326 uuid:019f2eca
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:327 uuid:218fbd0e
-  if (process.argv.length > 2) { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:328 uuid:eb50260c
-    if (process.argv[2] === '--run') { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:329 uuid:b9c5ce47
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:330 uuid:d7894f12
-      runUUIDProcess(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:331 uuid:6582f07e
-    } else if (process.argv[2] === '--rollback') { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:332 uuid:e618a203
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:333 uuid:5c1ab96f
-      rollbackLastRun(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:334 uuid:76bcabb2
-    } else { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:335 uuid:dcb9ad6b
-      console.log('Unknown command. Available commands: --run, --rollback'); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:336 uuid:aad6d617
-    } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:337 uuid:3fe20a49
-  } else { // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:338 uuid:e9907311
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:339 uuid:78636c46
-    showMenu(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:340 uuid:9afe204b
-  } // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:341 uuid:2a52750e
-} // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:342 uuid:11973ad3
-// commit:6a2a820|time:2025-04-18T16:15:26.984Z line:343 uuid:dd18613e
-main(); // commit:6a2a820|time:2025-04-18T16:15:26.984Z line:344 uuid:973f2529
+// time:2025-04-18T16:17:35.513Z line:1 uuid:2958a05d
+// time:2025-04-18T16:17:35.513Z line:2 uuid:bf17b3e6
+// time:2025-04-18T16:17:35.513Z line:3 uuid:7e8c378c
+// time:2025-04-18T16:17:35.513Z line:4 uuid:eaf85373
+// time:2025-04-18T16:17:35.513Z line:5 uuid:04af80c8
+// time:2025-04-18T16:17:35.513Z line:6 uuid:d0fc5a3a
+// time:2025-04-18T16:17:35.513Z line:7 uuid:a79eb0f1
+// time:2025-04-18T16:17:35.513Z line:8 uuid:463481c8
+// time:2025-04-18T16:17:35.513Z line:9 uuid:5b01cfc5
+// time:2025-04-18T16:17:35.513Z line:10 uuid:df5c4520
+const fs = require('fs'); // time:2025-04-18T16:17:35.513Z line:11 uuid:1d6ca874
+const path = require('path'); // time:2025-04-18T16:17:35.513Z line:12 uuid:5212889c
+const crypto = require('crypto'); // time:2025-04-18T16:17:35.513Z line:13 uuid:271ff403
+const { execSync } = require('child_process'); // time:2025-04-18T16:17:35.513Z line:14 uuid:d0888ee4
+const readline = require('readline'); // time:2025-04-18T16:17:35.513Z line:15 uuid:08a2815f
+// time:2025-04-18T16:17:35.513Z line:16 uuid:477e8dec
+const CONFIG_FILE = '.uuid-cli-config.json'; // time:2025-04-18T16:17:35.513Z line:17 uuid:f03619af
+const BACKUP_DIR = '.uuid-cli-backups'; // time:2025-04-18T16:17:35.513Z line:18 uuid:e606cd2e
+const SCRIPT_FILENAME = path.basename(__filename); // time:2025-04-18T16:17:35.513Z line:19 uuid:b8abba89
+const SKIP_DIRS = ['node_modules', 'dist', 'build', '.git', 'coverage', BACKUP_DIR]; // time:2025-04-18T16:17:35.513Z line:20 uuid:4a697a94
+// time:2025-04-18T16:17:35.513Z line:21 uuid:621c5e22
+// time:2025-04-18T16:17:35.513Z line:22 uuid:f8ea414f
+let config = { // time:2025-04-18T16:17:35.513Z line:23 uuid:109bf060
+  includeBranch: true, // time:2025-04-18T16:17:35.513Z line:24 uuid:71b7293e
+  includeCommit: true, // time:2025-04-18T16:17:35.513Z line:25 uuid:1dc38061
+  includeTimestamp: true, // time:2025-04-18T16:17:35.513Z line:26 uuid:580fc192
+  includeLineNumber: true // time:2025-04-18T16:17:35.513Z line:27 uuid:40fc25b6
+}; // time:2025-04-18T16:17:35.513Z line:28 uuid:97e4a5c4
+// time:2025-04-18T16:17:35.513Z line:29 uuid:ff4bfe01
+// time:2025-04-18T16:17:35.513Z line:30 uuid:a01e22bc
+let lastRunInfo = { // time:2025-04-18T16:17:35.513Z line:31 uuid:b3ef7929
+  timestamp: null, // time:2025-04-18T16:17:35.513Z line:32 uuid:41abb9a0
+  files: [] // time:2025-04-18T16:17:35.513Z line:33 uuid:926c9059
+}; // time:2025-04-18T16:17:35.513Z line:34 uuid:8d95c725
+// time:2025-04-18T16:17:35.513Z line:35 uuid:b3e16a3e
+function generateShortUUID() { // time:2025-04-18T16:17:35.513Z line:36 uuid:b261d630
+  return crypto.randomBytes(4).toString('hex'); // time:2025-04-18T16:17:35.513Z line:37 uuid:3643e7a9
+} // time:2025-04-18T16:17:35.513Z line:38 uuid:51752103
+// time:2025-04-18T16:17:35.513Z line:39 uuid:d959a062
+function getGitInfo() { // time:2025-04-18T16:17:35.513Z line:40 uuid:e20b2364
+  try { // time:2025-04-18T16:17:35.513Z line:41 uuid:f0f4fb8f
+    execSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' }); // time:2025-04-18T16:17:35.513Z line:42 uuid:01773e68
+    let branch; // time:2025-04-18T16:17:35.513Z line:43 uuid:ee8c9542
+// time:2025-04-18T16:17:35.513Z line:44 uuid:6991eab6
+// time:2025-04-18T16:17:35.513Z line:45 uuid:33dfa1e7
+    if (process.env.BRANCH_NAME) { // time:2025-04-18T16:17:35.513Z line:46 uuid:7d8711ec
+      branch = process.env.BRANCH_NAME; // time:2025-04-18T16:17:35.513Z line:47 uuid:b089783c
+    } else if (process.env.GIT_BRANCH) { // time:2025-04-18T16:17:35.513Z line:48 uuid:ad1b4e0f
+      branch = process.env.GIT_BRANCH; // time:2025-04-18T16:17:35.513Z line:49 uuid:6098e7b7
+    } else { // time:2025-04-18T16:17:35.513Z line:50 uuid:7fd0b175
+// time:2025-04-18T16:17:35.513Z line:51 uuid:6d793a1b
+      branch = execSync('git branch --show-current', { encoding: 'utf8' }).trim(); // time:2025-04-18T16:17:35.513Z line:52 uuid:26877088
+    } // time:2025-04-18T16:17:35.513Z line:53 uuid:f89ba03c
+// time:2025-04-18T16:17:35.513Z line:54 uuid:487a731b
+    const lastCommit = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim(); // time:2025-04-18T16:17:35.513Z line:55 uuid:943f2b0e
+    return { branch, lastCommit }; // time:2025-04-18T16:17:35.513Z line:56 uuid:05720ea3
+  } catch (error) { // time:2025-04-18T16:17:35.513Z line:57 uuid:95bebab7
+    console.log('Git info detection error:', error.message); // time:2025-04-18T16:17:35.513Z line:58 uuid:79e03dd5
+    return { branch: null, lastCommit: null }; // time:2025-04-18T16:17:35.513Z line:59 uuid:6add44cc
+  } // time:2025-04-18T16:17:35.513Z line:60 uuid:0b956a7e
+} // time:2025-04-18T16:17:35.513Z line:61 uuid:76dc1815
+// time:2025-04-18T16:17:35.513Z line:62 uuid:176d5ec5
+function loadConfig() { // time:2025-04-18T16:17:35.513Z line:63 uuid:044281b6
+  try { // time:2025-04-18T16:17:35.513Z line:64 uuid:5d26a8db
+    if (fs.existsSync(CONFIG_FILE)) { // time:2025-04-18T16:17:35.513Z line:65 uuid:87ea5bba
+      const fileContent = fs.readFileSync(CONFIG_FILE, 'utf8'); // time:2025-04-18T16:17:35.513Z line:66 uuid:5ea23e18
+      const data = JSON.parse(fileContent); // time:2025-04-18T16:17:35.513Z line:67 uuid:8f2bd269
+// time:2025-04-18T16:17:35.513Z line:68 uuid:917279af
+// time:2025-04-18T16:17:35.513Z line:69 uuid:61cded4b
+      if (data.config) { // time:2025-04-18T16:17:35.513Z line:70 uuid:cdee2577
+        config = data.config; // time:2025-04-18T16:17:35.513Z line:71 uuid:f37dc6ea
+      } // time:2025-04-18T16:17:35.513Z line:72 uuid:f3e95a5a
+// time:2025-04-18T16:17:35.513Z line:73 uuid:960d7c6b
+// time:2025-04-18T16:17:35.513Z line:74 uuid:32acf78e
+      if (data.lastRun) { // time:2025-04-18T16:17:35.513Z line:75 uuid:1be9916a
+        lastRunInfo = data.lastRun; // time:2025-04-18T16:17:35.513Z line:76 uuid:63f8ca91
+      } // time:2025-04-18T16:17:35.513Z line:77 uuid:d1568932
+// time:2025-04-18T16:17:35.513Z line:78 uuid:2969747e
+      console.log('Loaded configuration:', config); // time:2025-04-18T16:17:35.513Z line:79 uuid:27c77a2a
+    } // time:2025-04-18T16:17:35.513Z line:80 uuid:ba9bd8e0
+  } catch (error) { // time:2025-04-18T16:17:35.513Z line:81 uuid:ea3afe20
+    console.error('Error loading config:', error.message); // time:2025-04-18T16:17:35.513Z line:82 uuid:84784217
+  } // time:2025-04-18T16:17:35.513Z line:83 uuid:037b037a
+} // time:2025-04-18T16:17:35.513Z line:84 uuid:c3d44588
+// time:2025-04-18T16:17:35.513Z line:85 uuid:0710d8e8
+function saveConfig() { // time:2025-04-18T16:17:35.513Z line:86 uuid:b531343f
+  try { // time:2025-04-18T16:17:35.513Z line:87 uuid:98c33a9d
+// time:2025-04-18T16:17:35.513Z line:88 uuid:036a4d76
+    const data = { // time:2025-04-18T16:17:35.513Z line:89 uuid:ab6a5b38
+      config, // time:2025-04-18T16:17:35.513Z line:90 uuid:5fef1580
+      lastRun: lastRunInfo // time:2025-04-18T16:17:35.513Z line:91 uuid:4edd3df4
+    }; // time:2025-04-18T16:17:35.513Z line:92 uuid:b8426a95
+// time:2025-04-18T16:17:35.513Z line:93 uuid:48385e7f
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(data, null, 2)); // time:2025-04-18T16:17:35.513Z line:94 uuid:f3c01d04
+    console.log('Configuration saved.'); // time:2025-04-18T16:17:35.513Z line:95 uuid:9a35af2e
+  } catch (error) { // time:2025-04-18T16:17:35.513Z line:96 uuid:59a0dbc6
+    console.error('Error saving config:', error.message); // time:2025-04-18T16:17:35.513Z line:97 uuid:d35f5a0e
+  } // time:2025-04-18T16:17:35.513Z line:98 uuid:c59f1373
+} // time:2025-04-18T16:17:35.513Z line:99 uuid:ef88f581
+// time:2025-04-18T16:17:35.513Z line:100 uuid:39e7d907
+function ensureBackupDir() { // time:2025-04-18T16:17:35.513Z line:101 uuid:5d57f36c
+  if (!fs.existsSync(BACKUP_DIR)) { // time:2025-04-18T16:17:35.513Z line:102 uuid:d4f6ca09
+    fs.mkdirSync(BACKUP_DIR, { recursive: true }); // time:2025-04-18T16:17:35.513Z line:103 uuid:cd643481
+    console.log(`Created backup directory: ${BACKUP_DIR}`); // time:2025-04-18T16:17:35.513Z line:104 uuid:fcebfa43
+  } // time:2025-04-18T16:17:35.513Z line:105 uuid:b0558211
+} // time:2025-04-18T16:17:35.513Z line:106 uuid:5c183b15
+// time:2025-04-18T16:17:35.513Z line:107 uuid:8cb0ae4b
+function backupFile(filePath) { // time:2025-04-18T16:17:35.513Z line:108 uuid:57b2e4d5
+  try { // time:2025-04-18T16:17:35.513Z line:109 uuid:d54a1d88
+    ensureBackupDir(); // time:2025-04-18T16:17:35.513Z line:110 uuid:ae3542ba
+// time:2025-04-18T16:17:35.513Z line:111 uuid:0086f10d
+    const content = fs.readFileSync(filePath, 'utf8'); // time:2025-04-18T16:17:35.513Z line:112 uuid:9c007b4e
+    const fileName = path.basename(filePath); // time:2025-04-18T16:17:35.513Z line:113 uuid:03cc05fb
+    const relativePath = path.relative(process.cwd(), filePath); // time:2025-04-18T16:17:35.513Z line:114 uuid:39336288
+    const backupPath = path.join(BACKUP_DIR, `${fileName}.${Date.now()}.bak`); // time:2025-04-18T16:17:35.513Z line:115 uuid:ba8b669b
+// time:2025-04-18T16:17:35.513Z line:116 uuid:cc641438
+    fs.writeFileSync(backupPath, content); // time:2025-04-18T16:17:35.513Z line:117 uuid:e35cc576
+    return { relativePath, backupPath }; // time:2025-04-18T16:17:35.513Z line:118 uuid:c3606610
+  } catch (error) { // time:2025-04-18T16:17:35.513Z line:119 uuid:48824345
+    console.error(`Error backing up ${filePath}: ${error.message}`); // time:2025-04-18T16:17:35.513Z line:120 uuid:82670526
+    return null; // time:2025-04-18T16:17:35.513Z line:121 uuid:38abb6ef
+  } // time:2025-04-18T16:17:35.513Z line:122 uuid:205a34e0
+} // time:2025-04-18T16:17:35.513Z line:123 uuid:56a79a22
+// time:2025-04-18T16:17:35.513Z line:124 uuid:34b90d37
+function addUUIDsToFile(filePath) { // time:2025-04-18T16:17:35.513Z line:125 uuid:8209b378
+  try { // time:2025-04-18T16:17:35.513Z line:126 uuid:09c32d40
+    if (path.basename(filePath) === SCRIPT_FILENAME) { // time:2025-04-18T16:17:35.513Z line:127 uuid:629a9f0c
+      console.log(`Skipping self: ${filePath}`); // time:2025-04-18T16:17:35.513Z line:128 uuid:525948b0
+      return null; // time:2025-04-18T16:17:35.513Z line:129 uuid:d55731f6
+    } // time:2025-04-18T16:17:35.513Z line:130 uuid:3529a3d0
+// time:2025-04-18T16:17:35.513Z line:131 uuid:a96b14da
+// time:2025-04-18T16:17:35.513Z line:132 uuid:c6cdbef6
+    const backup = backupFile(filePath); // time:2025-04-18T16:17:35.513Z line:133 uuid:2743e7ed
+    if (!backup) return null; // time:2025-04-18T16:17:35.513Z line:134 uuid:db4e7caf
+// time:2025-04-18T16:17:35.513Z line:135 uuid:c4026515
+    const { branch, lastCommit } = getGitInfo(); // time:2025-04-18T16:17:35.513Z line:136 uuid:fee77ca7
+    const timestamp = new Date().toISOString(); // time:2025-04-18T16:17:35.513Z line:137 uuid:0a6f3d98
+// time:2025-04-18T16:17:35.513Z line:138 uuid:adb0594b
+// time:2025-04-18T16:17:35.513Z line:139 uuid:a077bb9b
+    let metaParts = []; // time:2025-04-18T16:17:35.513Z line:140 uuid:4cb7b49f
+    if (config.includeBranch && branch) metaParts.push(branch); // time:2025-04-18T16:17:35.513Z line:141 uuid:ffcef6bc
+    if (config.includeCommit && lastCommit) metaParts.push(lastCommit); // time:2025-04-18T16:17:35.513Z line:142 uuid:08e316ac
+    if (config.includeTimestamp) metaParts.push(timestamp); // time:2025-04-18T16:17:35.513Z line:143 uuid:7130d617
+    const metaInfo = metaParts.join('|'); // time:2025-04-18T16:17:35.513Z line:144 uuid:c72c0adf
+// time:2025-04-18T16:17:35.513Z line:145 uuid:a1a27fd8
+    let content = fs.readFileSync(filePath, 'utf8'); // time:2025-04-18T16:17:35.513Z line:146 uuid:ae09cc3a
+    const lines = content.split('\n'); // time:2025-04-18T16:17:35.513Z line:147 uuid:295767ca
+// time:2025-04-18T16:17:35.513Z line:148 uuid:86b0bd6a
+    const updatedLines = lines.map((line, index) => { // time:2025-04-18T16:17:35.513Z line:149 uuid:3a6f3502
+      const lineNumber = index + 1; // time:2025-04-18T16:17:35.513Z line:150 uuid:1e70c164
+      let cleanLine = line; // time:2025-04-18T16:17:35.513Z line:151 uuid:6eeebbc8
+// time:2025-04-18T16:17:35.513Z line:152 uuid:88bc111d
+      if (line.includes(' // time:2025-04-18T16:17:35.513Z line:153 uuid:7e58f6ec
+        cleanLine = line.substring(0, line.indexOf(' // time:2025-04-18T16:17:35.513Z line:154 uuid:2a38e0ae
+      } // time:2025-04-18T16:17:35.513Z line:155 uuid:998f1fbd
+// time:2025-04-18T16:17:35.513Z line:156 uuid:17c6464a
+      let comment = ' // time:2025-04-18T16:17:35.513Z line:157 uuid:13f0c1a6
+      if (metaInfo) comment += `${metaInfo} `; // time:2025-04-18T16:17:35.513Z line:158 uuid:2ab1768d
+      if (config.includeLineNumber) comment += `line:${lineNumber} `; // time:2025-04-18T16:17:35.513Z line:159 uuid:5ff15996
+      comment += `uuid:${generateShortUUID()}`; // time:2025-04-18T16:17:35.513Z line:160 uuid:10f862e8
+// time:2025-04-18T16:17:35.513Z line:161 uuid:73caa7a9
+      if (cleanLine.trim() === '') { // time:2025-04-18T16:17:35.513Z line:162 uuid:0ab5c966
+        return comment.trim(); // time:2025-04-18T16:17:35.513Z line:163 uuid:d4c74589
+      } // time:2025-04-18T16:17:35.513Z line:164 uuid:cd413bfa
+// time:2025-04-18T16:17:35.513Z line:165 uuid:fa96d6bf
+      return `${cleanLine.trimEnd()}${comment}`; // time:2025-04-18T16:17:35.513Z line:166 uuid:7d5512a2
+    }); // time:2025-04-18T16:17:35.513Z line:167 uuid:1342b32f
+// time:2025-04-18T16:17:35.513Z line:168 uuid:8a86a451
+    fs.writeFileSync(filePath, updatedLines.join('\n')); // time:2025-04-18T16:17:35.513Z line:169 uuid:6f8ea257
+    console.log(`Updated: ${filePath}`); // time:2025-04-18T16:17:35.513Z line:170 uuid:164d6b10
+// time:2025-04-18T16:17:35.513Z line:171 uuid:8df04719
+    return backup; // time:2025-04-18T16:17:35.513Z line:172 uuid:289bccfb
+  } catch (error) { // time:2025-04-18T16:17:35.513Z line:173 uuid:4cf03fe0
+    console.error(`Error processing ${filePath}: ${error.message}`); // time:2025-04-18T16:17:35.513Z line:174 uuid:07905682
+    return null; // time:2025-04-18T16:17:35.513Z line:175 uuid:0a07d0d4
+  } // time:2025-04-18T16:17:35.513Z line:176 uuid:fc9c804b
+} // time:2025-04-18T16:17:35.513Z line:177 uuid:6c475a0b
+// time:2025-04-18T16:17:35.513Z line:178 uuid:4a876293
+function processDirectory(dirPath) { // time:2025-04-18T16:17:35.513Z line:179 uuid:2f013add
+  const modifiedFiles = []; // time:2025-04-18T16:17:35.513Z line:180 uuid:04072f84
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true }); // time:2025-04-18T16:17:35.513Z line:181 uuid:dc84f84b
+// time:2025-04-18T16:17:35.513Z line:182 uuid:7836f94c
+  for (const entry of entries) { // time:2025-04-18T16:17:35.513Z line:183 uuid:44dade0a
+    const fullPath = path.join(dirPath, entry.name); // time:2025-04-18T16:17:35.513Z line:184 uuid:96825f05
+// time:2025-04-18T16:17:35.513Z line:185 uuid:579d1fd5
+    if (entry.isDirectory()) { // time:2025-04-18T16:17:35.513Z line:186 uuid:1bc7f22a
+      if (!SKIP_DIRS.includes(entry.name)) { // time:2025-04-18T16:17:35.513Z line:187 uuid:874515f9
+        const subDirResults = processDirectory(fullPath); // time:2025-04-18T16:17:35.513Z line:188 uuid:4fbd2d02
+        modifiedFiles.push(...subDirResults); // time:2025-04-18T16:17:35.513Z line:189 uuid:cb39f156
+      } // time:2025-04-18T16:17:35.513Z line:190 uuid:c595beee
+    } else if (entry.isFile() && /\.js$/.test(entry.name)) { // time:2025-04-18T16:17:35.513Z line:191 uuid:6bb842ea
+      const result = addUUIDsToFile(fullPath); // time:2025-04-18T16:17:35.513Z line:192 uuid:47af3bda
+      if (result) { // time:2025-04-18T16:17:35.513Z line:193 uuid:0665736b
+        modifiedFiles.push(result); // time:2025-04-18T16:17:35.513Z line:194 uuid:a794f01e
+      } // time:2025-04-18T16:17:35.513Z line:195 uuid:08b31a75
+    } // time:2025-04-18T16:17:35.513Z line:196 uuid:c8439f87
+  } // time:2025-04-18T16:17:35.513Z line:197 uuid:6ad07696
+// time:2025-04-18T16:17:35.513Z line:198 uuid:fd554b63
+  return modifiedFiles; // time:2025-04-18T16:17:35.513Z line:199 uuid:082557a9
+} // time:2025-04-18T16:17:35.513Z line:200 uuid:75fbe0a9
+// time:2025-04-18T16:17:35.513Z line:201 uuid:8974f352
+function rollbackLastRun() { // time:2025-04-18T16:17:35.513Z line:202 uuid:f9b279e5
+  if (!lastRunInfo.timestamp || lastRunInfo.files.length === 0) { // time:2025-04-18T16:17:35.513Z line:203 uuid:73486aa3
+    console.log('No previous run found to rollback.'); // time:2025-04-18T16:17:35.513Z line:204 uuid:6697fadd
+    return; // time:2025-04-18T16:17:35.513Z line:205 uuid:2e740ba2
+  } // time:2025-04-18T16:17:35.513Z line:206 uuid:15ef865f
+// time:2025-04-18T16:17:35.513Z line:207 uuid:eea12a37
+  console.log(`Rolling back run from ${new Date(lastRunInfo.timestamp).toLocaleString()}`); // time:2025-04-18T16:17:35.513Z line:208 uuid:f1f4948e
+  console.log(`Files to restore: ${lastRunInfo.files.length}`); // time:2025-04-18T16:17:35.513Z line:209 uuid:e4c4ad59
+// time:2025-04-18T16:17:35.513Z line:210 uuid:35fe8b1c
+  let successCount = 0; // time:2025-04-18T16:17:35.513Z line:211 uuid:87f1606e
+// time:2025-04-18T16:17:35.513Z line:212 uuid:8cada02c
+  for (const file of lastRunInfo.files) { // time:2025-04-18T16:17:35.513Z line:213 uuid:46798bc2
+    try { // time:2025-04-18T16:17:35.513Z line:214 uuid:42054c99
+      if (fs.existsSync(file.backupPath)) { // time:2025-04-18T16:17:35.513Z line:215 uuid:26a3fea7
+        const backupContent = fs.readFileSync(file.backupPath, 'utf8'); // time:2025-04-18T16:17:35.513Z line:216 uuid:b0abd98d
+        const targetPath = path.join(process.cwd(), file.relativePath); // time:2025-04-18T16:17:35.513Z line:217 uuid:ed507530
+// time:2025-04-18T16:17:35.513Z line:218 uuid:cd4f8a44
+        fs.writeFileSync(targetPath, backupContent); // time:2025-04-18T16:17:35.513Z line:219 uuid:df3790bb
+        console.log(`Restored: ${file.relativePath}`); // time:2025-04-18T16:17:35.513Z line:220 uuid:4a438329
+        successCount++; // time:2025-04-18T16:17:35.513Z line:221 uuid:0303d3fc
+      } else { // time:2025-04-18T16:17:35.513Z line:222 uuid:af9e4f31
+        console.error(`Backup not found: ${file.backupPath}`); // time:2025-04-18T16:17:35.513Z line:223 uuid:b1788571
+      } // time:2025-04-18T16:17:35.513Z line:224 uuid:445f7605
+    } catch (error) { // time:2025-04-18T16:17:35.513Z line:225 uuid:fee46050
+      console.error(`Error restoring ${file.relativePath}: ${error.message}`); // time:2025-04-18T16:17:35.513Z line:226 uuid:19961113
+    } // time:2025-04-18T16:17:35.513Z line:227 uuid:a835319e
+  } // time:2025-04-18T16:17:35.513Z line:228 uuid:928d39e0
+// time:2025-04-18T16:17:35.513Z line:229 uuid:c6511560
+  console.log(`Rollback completed. Restored ${successCount} of ${lastRunInfo.files.length} files.`); // time:2025-04-18T16:17:35.513Z line:230 uuid:2408dab5
+// time:2025-04-18T16:17:35.513Z line:231 uuid:bf86bbeb
+// time:2025-04-18T16:17:35.513Z line:232 uuid:dcc2086f
+  lastRunInfo = { // time:2025-04-18T16:17:35.513Z line:233 uuid:6d1efa01
+    timestamp: null, // time:2025-04-18T16:17:35.513Z line:234 uuid:3a2f771d
+    files: [] // time:2025-04-18T16:17:35.513Z line:235 uuid:0bffe59f
+  }; // time:2025-04-18T16:17:35.513Z line:236 uuid:4baf0c88
+// time:2025-04-18T16:17:35.513Z line:237 uuid:ef05c3db
+  saveConfig(); // time:2025-04-18T16:17:35.513Z line:238 uuid:40fe29f7
+} // time:2025-04-18T16:17:35.513Z line:239 uuid:a8608b6f
+// time:2025-04-18T16:17:35.513Z line:240 uuid:8e01bbf1
+function runUUIDProcess() { // time:2025-04-18T16:17:35.513Z line:241 uuid:78813354
+  const modifiedFiles = processDirectory(process.cwd()); // time:2025-04-18T16:17:35.513Z line:242 uuid:0d43d1fc
+// time:2025-04-18T16:17:35.513Z line:243 uuid:02110251
+// time:2025-04-18T16:17:35.513Z line:244 uuid:552e852c
+  lastRunInfo = { // time:2025-04-18T16:17:35.513Z line:245 uuid:55f6b451
+    timestamp: Date.now(), // time:2025-04-18T16:17:35.513Z line:246 uuid:8d11f4b8
+    files: modifiedFiles // time:2025-04-18T16:17:35.513Z line:247 uuid:f6ab9b67
+  }; // time:2025-04-18T16:17:35.513Z line:248 uuid:e375e0c9
+// time:2025-04-18T16:17:35.513Z line:249 uuid:693a8cd2
+  saveConfig(); // time:2025-04-18T16:17:35.513Z line:250 uuid:1218a66f
+  console.log(`Run completed. Modified ${modifiedFiles.length} files.`); // time:2025-04-18T16:17:35.513Z line:251 uuid:248efe4f
+} // time:2025-04-18T16:17:35.513Z line:252 uuid:a96d1e77
+// time:2025-04-18T16:17:35.513Z line:253 uuid:c286e6a0
+function showMenu() { // time:2025-04-18T16:17:35.513Z line:254 uuid:ee93fc8e
+  const rl = readline.createInterface({ // time:2025-04-18T16:17:35.513Z line:255 uuid:bfa5970d
+    input: process.stdin, // time:2025-04-18T16:17:35.513Z line:256 uuid:e4adc136
+    output: process.stdout // time:2025-04-18T16:17:35.513Z line:257 uuid:406fb50a
+  }); // time:2025-04-18T16:17:35.513Z line:258 uuid:d98ec506
+// time:2025-04-18T16:17:35.513Z line:259 uuid:79eb6921
+  console.log('\nUUID CLI Configuration:'); // time:2025-04-18T16:17:35.513Z line:260 uuid:59974049
+  console.log('1. Include Branch Name: ' + (config.includeBranch ? 'Yes' : 'No')); // time:2025-04-18T16:17:35.513Z line:261 uuid:2d248629
+  console.log('2. Include Last Commit: ' + (config.includeCommit ? 'Yes' : 'No')); // time:2025-04-18T16:17:35.513Z line:262 uuid:192ec0ba
+  console.log('3. Include Timestamp: ' + (config.includeTimestamp ? 'Yes' : 'No')); // time:2025-04-18T16:17:35.513Z line:263 uuid:286364c7
+  console.log('4. Include Line Numbers: ' + (config.includeLineNumber ? 'Yes' : 'No')); // time:2025-04-18T16:17:35.513Z line:264 uuid:56f1d675
+  console.log('5. Reset to Defaults'); // time:2025-04-18T16:17:35.513Z line:265 uuid:fe6fc078
+  console.log('6. Save and Run'); // time:2025-04-18T16:17:35.513Z line:266 uuid:ed1db9f3
+  console.log('7. Rollback Last Run'); // time:2025-04-18T16:17:35.513Z line:267 uuid:8d199ebd
+  console.log('8. Exit'); // time:2025-04-18T16:17:35.513Z line:268 uuid:31d46a6f
+// time:2025-04-18T16:17:35.513Z line:269 uuid:c9e4e581
+  rl.question('\nEnter option number: ', (answer) => { // time:2025-04-18T16:17:35.513Z line:270 uuid:78ebdc73
+    switch(answer) { // time:2025-04-18T16:17:35.513Z line:271 uuid:a9b2f73f
+      case '1': // time:2025-04-18T16:17:35.513Z line:272 uuid:3b4853c7
+        config.includeBranch = !config.includeBranch; // time:2025-04-18T16:17:35.513Z line:273 uuid:78bf1034
+        rl.close(); // time:2025-04-18T16:17:35.513Z line:274 uuid:18efd0e4
+        showMenu(); // time:2025-04-18T16:17:35.513Z line:275 uuid:2908b728
+        break; // time:2025-04-18T16:17:35.513Z line:276 uuid:3cfe96a9
+      case '2': // time:2025-04-18T16:17:35.513Z line:277 uuid:3db40f2c
+        config.includeCommit = !config.includeCommit; // time:2025-04-18T16:17:35.513Z line:278 uuid:071eb937
+        rl.close(); // time:2025-04-18T16:17:35.513Z line:279 uuid:84468624
+        showMenu(); // time:2025-04-18T16:17:35.513Z line:280 uuid:053de858
+        break; // time:2025-04-18T16:17:35.513Z line:281 uuid:074f9094
+      case '3': // time:2025-04-18T16:17:35.513Z line:282 uuid:26b2f12d
+        config.includeTimestamp = !config.includeTimestamp; // time:2025-04-18T16:17:35.513Z line:283 uuid:739a2ae3
+        rl.close(); // time:2025-04-18T16:17:35.513Z line:284 uuid:fb3ba0ad
+        showMenu(); // time:2025-04-18T16:17:35.513Z line:285 uuid:68feea3c
+        break; // time:2025-04-18T16:17:35.513Z line:286 uuid:20dd8a2d
+      case '4': // time:2025-04-18T16:17:35.513Z line:287 uuid:0178f48d
+        config.includeLineNumber = !config.includeLineNumber; // time:2025-04-18T16:17:35.513Z line:288 uuid:4fab5a0a
+        rl.close(); // time:2025-04-18T16:17:35.513Z line:289 uuid:64787fa1
+        showMenu(); // time:2025-04-18T16:17:35.513Z line:290 uuid:e6d39893
+        break; // time:2025-04-18T16:17:35.513Z line:291 uuid:abd29f88
+      case '5': // time:2025-04-18T16:17:35.513Z line:292 uuid:c9a2d615
+        config = { // time:2025-04-18T16:17:35.513Z line:293 uuid:e2e4d3bf
+          includeBranch: true, // time:2025-04-18T16:17:35.513Z line:294 uuid:efb55ee8
+          includeCommit: true, // time:2025-04-18T16:17:35.513Z line:295 uuid:95f37da6
+          includeTimestamp: true, // time:2025-04-18T16:17:35.513Z line:296 uuid:6ee369eb
+          includeLineNumber: true // time:2025-04-18T16:17:35.513Z line:297 uuid:f21dfa89
+        }; // time:2025-04-18T16:17:35.513Z line:298 uuid:499ec8e6
+        rl.close(); // time:2025-04-18T16:17:35.513Z line:299 uuid:e9c90368
+        showMenu(); // time:2025-04-18T16:17:35.513Z line:300 uuid:850fa479
+        break; // time:2025-04-18T16:17:35.513Z line:301 uuid:aa3903f0
+      case '6': // time:2025-04-18T16:17:35.513Z line:302 uuid:02d81258
+        saveConfig(); // time:2025-04-18T16:17:35.513Z line:303 uuid:f1617fe0
+        rl.close(); // time:2025-04-18T16:17:35.513Z line:304 uuid:489ae4cc
+        runUUIDProcess(); // time:2025-04-18T16:17:35.513Z line:305 uuid:95a3211e
+        break; // time:2025-04-18T16:17:35.513Z line:306 uuid:e6f52746
+      case '7': // time:2025-04-18T16:17:35.513Z line:307 uuid:b7d831b4
+        rl.close(); // time:2025-04-18T16:17:35.513Z line:308 uuid:ec6d2354
+        rollbackLastRun(); // time:2025-04-18T16:17:35.513Z line:309 uuid:939246a2
+        showMenu(); // time:2025-04-18T16:17:35.513Z line:310 uuid:5a74a07c
+        break; // time:2025-04-18T16:17:35.513Z line:311 uuid:0677cc47
+      case '8': // time:2025-04-18T16:17:35.513Z line:312 uuid:92150eb6
+        console.log('Exiting without changes.'); // time:2025-04-18T16:17:35.513Z line:313 uuid:9098fc77
+        rl.close(); // time:2025-04-18T16:17:35.513Z line:314 uuid:9fb331d7
+        break; // time:2025-04-18T16:17:35.513Z line:315 uuid:74ee8076
+      default: // time:2025-04-18T16:17:35.513Z line:316 uuid:5c55796e
+        console.log('Invalid option. Please try again.'); // time:2025-04-18T16:17:35.513Z line:317 uuid:41518e8a
+        rl.close(); // time:2025-04-18T16:17:35.513Z line:318 uuid:b9629447
+        showMenu(); // time:2025-04-18T16:17:35.513Z line:319 uuid:3adeb115
+    } // time:2025-04-18T16:17:35.513Z line:320 uuid:76bbaf1f
+  }); // time:2025-04-18T16:17:35.513Z line:321 uuid:8cffff3b
+} // time:2025-04-18T16:17:35.513Z line:322 uuid:7389e7e9
+// time:2025-04-18T16:17:35.513Z line:323 uuid:363599bd
+// time:2025-04-18T16:17:35.513Z line:324 uuid:7758bd67
+function main() { // time:2025-04-18T16:17:35.513Z line:325 uuid:df15ed95
+  loadConfig(); // time:2025-04-18T16:17:35.513Z line:326 uuid:bcdd6cca
+// time:2025-04-18T16:17:35.513Z line:327 uuid:f49366fb
+  if (process.argv.length > 2) { // time:2025-04-18T16:17:35.513Z line:328 uuid:3441cc4f
+    if (process.argv[2] === '--run') { // time:2025-04-18T16:17:35.513Z line:329 uuid:fa5467b8
+// time:2025-04-18T16:17:35.513Z line:330 uuid:ef87d64e
+      runUUIDProcess(); // time:2025-04-18T16:17:35.513Z line:331 uuid:b851099d
+    } else if (process.argv[2] === '--rollback') { // time:2025-04-18T16:17:35.513Z line:332 uuid:6671e089
+// time:2025-04-18T16:17:35.513Z line:333 uuid:98d4687e
+      rollbackLastRun(); // time:2025-04-18T16:17:35.513Z line:334 uuid:5b5ab350
+    } else { // time:2025-04-18T16:17:35.513Z line:335 uuid:86186bfe
+      console.log('Unknown command. Available commands: --run, --rollback'); // time:2025-04-18T16:17:35.513Z line:336 uuid:0e2fc3f4
+    } // time:2025-04-18T16:17:35.513Z line:337 uuid:04c693b3
+  } else { // time:2025-04-18T16:17:35.513Z line:338 uuid:676066be
+// time:2025-04-18T16:17:35.513Z line:339 uuid:0c7a5fe2
+    showMenu(); // time:2025-04-18T16:17:35.513Z line:340 uuid:e4eea69c
+  } // time:2025-04-18T16:17:35.513Z line:341 uuid:ba7d6a07
+} // time:2025-04-18T16:17:35.513Z line:342 uuid:9bdffbc6
+// time:2025-04-18T16:17:35.513Z line:343 uuid:71ed7301
+main(); // time:2025-04-18T16:17:35.513Z line:344 uuid:12eaaa9c

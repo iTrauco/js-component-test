@@ -1,0 +1,4 @@
+export function getById(id) { // commit:5eff28d|time:2025-04-18T16:16:59.441Z line:1 uuid:70b43045
+  return document.getElementById(id); // commit:5eff28d|time:2025-04-18T16:16:59.441Z line:2 uuid:f81e002a
+} // commit:5eff28d|time:2025-04-18T16:16:59.441Z line:3 uuid:11fdb5eb
+// commit:5eff28d|time:2025-04-18T16:16:59.441Z line:4 uuid:92d10293

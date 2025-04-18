@@ -1,0 +1,11 @@
+const listeners = {}; // commit:5eff28d|time:2025-04-18T16:16:59.459Z line:1 uuid:c21726aa
+// commit:5eff28d|time:2025-04-18T16:16:59.459Z line:2 uuid:b7cd976a
+export const eventBus = { // commit:5eff28d|time:2025-04-18T16:16:59.459Z line:3 uuid:58f24c21
+  on(event, callback) { // commit:5eff28d|time:2025-04-18T16:16:59.459Z line:4 uuid:1ed50e4e
+    (listeners[event] ||= []).push(callback); // commit:5eff28d|time:2025-04-18T16:16:59.459Z line:5 uuid:ee51ee00
+  }, // commit:5eff28d|time:2025-04-18T16:16:59.459Z line:6 uuid:6230f52d
+  emit(event, data) { // commit:5eff28d|time:2025-04-18T16:16:59.459Z line:7 uuid:cc744f18
+    (listeners[event] || []).forEach(cb => cb(data)); // commit:5eff28d|time:2025-04-18T16:16:59.459Z line:8 uuid:75e0ace9
+  } // commit:5eff28d|time:2025-04-18T16:16:59.459Z line:9 uuid:fcd511d8
+}; // commit:5eff28d|time:2025-04-18T16:16:59.459Z line:10 uuid:9ecc7731
+// commit:5eff28d|time:2025-04-18T16:16:59.459Z line:11 uuid:d6cd73d1

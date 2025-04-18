@@ -1,0 +1,4 @@
+export function showModal(message) { // commit:5eff28d|time:2025-04-18T16:16:59.388Z line:1 uuid:5a12f2e8
+  alert(message); // commit:5eff28d|time:2025-04-18T16:16:59.388Z line:2 uuid:8b9f2d55
+} // commit:5eff28d|time:2025-04-18T16:16:59.388Z line:3 uuid:5967120e
+// commit:5eff28d|time:2025-04-18T16:16:59.388Z line:4 uuid:096f8ce3

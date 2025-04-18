@@ -1,0 +1,10 @@
+import { getById } from './utils/domUtils.js'; // commit:5eff28d|time:2025-04-18T16:16:59.424Z line:1 uuid:9aac70d4
+import { showModal } from './components/Modal.js'; // commit:5eff28d|time:2025-04-18T16:16:59.424Z line:2 uuid:58ea4fda
+// commit:5eff28d|time:2025-04-18T16:16:59.424Z line:3 uuid:1441a477
+document.addEventListener('DOMContentLoaded', () => { // commit:5eff28d|time:2025-04-18T16:16:59.424Z line:4 uuid:933fa65e
+  const btn = getById('test-btn'); // commit:5eff28d|time:2025-04-18T16:16:59.424Z line:5 uuid:85a4bace
+  btn.addEventListener('click', () => { // commit:5eff28d|time:2025-04-18T16:16:59.424Z line:6 uuid:83a38240
+    showModal('Modal opened by Button!'); // commit:5eff28d|time:2025-04-18T16:16:59.424Z line:7 uuid:cbbe1d9c
+  }); // commit:5eff28d|time:2025-04-18T16:16:59.424Z line:8 uuid:e8b3612a
+}); // commit:5eff28d|time:2025-04-18T16:16:59.424Z line:9 uuid:0fff19fa
+// commit:5eff28d|time:2025-04-18T16:16:59.424Z line:10 uuid:0426cf01

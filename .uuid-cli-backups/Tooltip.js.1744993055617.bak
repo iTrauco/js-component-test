@@ -1,0 +1,4 @@
+export function attachTooltip(el, text) { // commit:5eff28d|time:2025-04-18T16:16:59.406Z line:1 uuid:80408f3b
+  el.title = text; // commit:5eff28d|time:2025-04-18T16:16:59.406Z line:2 uuid:8d48ba30
+} // commit:5eff28d|time:2025-04-18T16:16:59.406Z line:3 uuid:695971bf
+// commit:5eff28d|time:2025-04-18T16:16:59.406Z line:4 uuid:ca719d45

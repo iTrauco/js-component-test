@@ -1,0 +1,12 @@
+const express = require('express'); // commit:5eff28d|time:2025-04-18T16:16:59.351Z line:1 uuid:ecaa5ce3
+const path = require('path'); // commit:5eff28d|time:2025-04-18T16:16:59.351Z line:2 uuid:305317cd
+const app = express(); // commit:5eff28d|time:2025-04-18T16:16:59.351Z line:3 uuid:bdd93d5a
+const PORT = 3000; // commit:5eff28d|time:2025-04-18T16:16:59.351Z line:4 uuid:bcb1ae06
+// commit:5eff28d|time:2025-04-18T16:16:59.351Z line:5 uuid:98bcf667
+app.use(express.static(path.join(__dirname, '../public'))); // commit:5eff28d|time:2025-04-18T16:16:59.351Z line:6 uuid:d396af36
+app.use(express.static(path.join(__dirname, '../src'))); // commit:5eff28d|time:2025-04-18T16:16:59.351Z line:7 uuid:c6490a7c
+// commit:5eff28d|time:2025-04-18T16:16:59.351Z line:8 uuid:e305800b
+app.listen(PORT, () => { // commit:5eff28d|time:2025-04-18T16:16:59.351Z line:9 uuid:c6eecf79
+  console.log(`🚀 Server running at http://localhost:${PORT}`); // commit:5eff28d|time:2025-04-18T16:16:59.351Z line:10 uuid:f066c851
+}); // commit:5eff28d|time:2025-04-18T16:16:59.351Z line:11 uuid:ba7049d4
+// commit:5eff28d|time:2025-04-18T16:16:59.351Z line:12 uuid:0d408dfe

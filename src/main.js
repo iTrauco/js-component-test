@@ -1,10 +1,10 @@
-import { getById } from './utils/domUtils.js'; // commit:6a2a820|time:2025-04-18T16:15:27.077Z line:1 uuid:3fa21a3d
-import { showModal } from './components/Modal.js'; // commit:6a2a820|time:2025-04-18T16:15:27.077Z line:2 uuid:1da637bb
-// commit:6a2a820|time:2025-04-18T16:15:27.077Z line:3 uuid:8e75ebea
-document.addEventListener('DOMContentLoaded', () => { // commit:6a2a820|time:2025-04-18T16:15:27.077Z line:4 uuid:5c9bc11a
-  const btn = getById('test-btn'); // commit:6a2a820|time:2025-04-18T16:15:27.077Z line:5 uuid:6db5ed63
-  btn.addEventListener('click', () => { // commit:6a2a820|time:2025-04-18T16:15:27.077Z line:6 uuid:abdd4bfd
-    showModal('Modal opened by Button!'); // commit:6a2a820|time:2025-04-18T16:15:27.077Z line:7 uuid:cbd71220
-  }); // commit:6a2a820|time:2025-04-18T16:15:27.077Z line:8 uuid:a6bb0c83
-}); // commit:6a2a820|time:2025-04-18T16:15:27.077Z line:9 uuid:4e3af351
-// commit:6a2a820|time:2025-04-18T16:15:27.077Z line:10 uuid:003a3abb
+import { getById } from './utils/domUtils.js'; // time:2025-04-18T16:17:35.652Z line:1 uuid:8df93a62
+import { showModal } from './components/Modal.js'; // time:2025-04-18T16:17:35.652Z line:2 uuid:d3bca688
+// time:2025-04-18T16:17:35.652Z line:3 uuid:f2d46465
+document.addEventListener('DOMContentLoaded', () => { // time:2025-04-18T16:17:35.652Z line:4 uuid:71745174
+  const btn = getById('test-btn'); // time:2025-04-18T16:17:35.652Z line:5 uuid:aa14da89
+  btn.addEventListener('click', () => { // time:2025-04-18T16:17:35.652Z line:6 uuid:1f5fe952
+    showModal('Modal opened by Button!'); // time:2025-04-18T16:17:35.652Z line:7 uuid:d93d6c2e
+  }); // time:2025-04-18T16:17:35.652Z line:8 uuid:22a595cf
+}); // time:2025-04-18T16:17:35.652Z line:9 uuid:e512fc6f
+// time:2025-04-18T16:17:35.652Z line:10 uuid:ea3e7abf

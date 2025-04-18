@@ -1,4 +1,4 @@
-export function attachTooltip(el, text) { // commit:6a2a820|time:2025-04-18T16:15:27.064Z line:1 uuid:40cb7bb4
-  el.title = text; // commit:6a2a820|time:2025-04-18T16:15:27.064Z line:2 uuid:44bfd377
-} // commit:6a2a820|time:2025-04-18T16:15:27.064Z line:3 uuid:18e7ab7b
-// commit:6a2a820|time:2025-04-18T16:15:27.064Z line:4 uuid:1b2d7195
+export function attachTooltip(el, text) { // time:2025-04-18T16:17:35.634Z line:1 uuid:9a8e1e22
+  el.title = text; // time:2025-04-18T16:17:35.634Z line:2 uuid:784719be
+} // time:2025-04-18T16:17:35.634Z line:3 uuid:2ae9008e
+// time:2025-04-18T16:17:35.634Z line:4 uuid:0dac29fe

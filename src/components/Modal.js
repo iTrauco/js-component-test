@@ -1,4 +1,4 @@
-export function showModal(message) { // commit:6a2a820|time:2025-04-18T16:15:27.049Z line:1 uuid:bbc8b660
-  alert(message); // commit:6a2a820|time:2025-04-18T16:15:27.049Z line:2 uuid:f0536fc7
-} // commit:6a2a820|time:2025-04-18T16:15:27.049Z line:3 uuid:fe37a6fc
-// commit:6a2a820|time:2025-04-18T16:15:27.049Z line:4 uuid:3b6029da
+export function showModal(message) { // time:2025-04-18T16:17:35.617Z line:1 uuid:0960f286
+  alert(message); // time:2025-04-18T16:17:35.617Z line:2 uuid:56c197c8
+} // time:2025-04-18T16:17:35.617Z line:3 uuid:92b08942
+// time:2025-04-18T16:17:35.617Z line:4 uuid:13ad14a1

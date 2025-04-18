@@ -1,4 +1,4 @@
-export function getById(id) { // commit:6a2a820|time:2025-04-18T16:15:27.093Z line:1 uuid:5de473e1
-  return document.getElementById(id); // commit:6a2a820|time:2025-04-18T16:15:27.093Z line:2 uuid:4effface
-} // commit:6a2a820|time:2025-04-18T16:15:27.093Z line:3 uuid:c95746a8
-// commit:6a2a820|time:2025-04-18T16:15:27.093Z line:4 uuid:f2ba57c3
+export function getById(id) { // time:2025-04-18T16:17:35.670Z line:1 uuid:e6b887ee
+  return document.getElementById(id); // time:2025-04-18T16:17:35.670Z line:2 uuid:0878f1f3
+} // time:2025-04-18T16:17:35.670Z line:3 uuid:1a6c7389
+// time:2025-04-18T16:17:35.670Z line:4 uuid:348fa643

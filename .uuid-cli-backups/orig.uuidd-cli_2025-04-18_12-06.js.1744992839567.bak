@@ -1,0 +1,201 @@
+// uuid:7eeca83e
+// uuid:bb77e7d4
+// uuid:9b68bdb3
+// uuid:8983fa04
+// uuid:0b25f20f
+#!/usr/bin/env node // uuid:5d305b9d
+const fs = require('fs'); // uuid:260ef21e
+const path = require('path'); // uuid:37a5bd16
+const crypto = require('crypto'); // uuid:0d0231d8
+const { execSync } = require('child_process'); // uuid:57c1704a
+const readline = require('readline'); // uuid:cb6894a2
+// uuid:e3566eb0
+const CONFIG_FILE = '.uuid-cli-config.json'; // uuid:3633ba71
+const SCRIPT_FILENAME = path.basename(__filename); // uuid:b8413a12
+const SKIP_DIRS = ['node_modules', 'dist', 'build', '.git', 'coverage']; // uuid:a8a07a22
+// uuid:3c7b9b9c
+// uuid:178682a1
+let config = { // uuid:f7451660
+  includeBranch: true, // uuid:0c67e7a9
+  includeCommit: true, // uuid:a11fde5d
+  includeTimestamp: true, // uuid:3e7abe9c
+  includeLineNumber: true // uuid:0b0cd0c3
+}; // uuid:6c842114
+// uuid:e4d18b66
+function generateShortUUID() { // uuid:386862d8
+  return crypto.randomBytes(4).toString('hex'); // uuid:4dac01bd
+} // uuid:53ffdc52
+// uuid:86c856ec
+function getGitInfo() { // uuid:554a9cde
+  try { // uuid:79a47824
+    execSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' }); // uuid:646ad880
+    const branch = execSync('git branch --show-current', { encoding: 'utf8' }).trim(); // uuid:005ede5e
+    const lastCommit = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim(); // uuid:23caa8e9
+    return { branch, lastCommit }; // uuid:520c5d86
+  } catch { // uuid:92d71b19
+    return { branch: null, lastCommit: null }; // uuid:d9f228e5
+  } // uuid:6f5bca63
+} // uuid:63743e0f
+// uuid:34cc43f4
+function loadConfig() { // uuid:5daa24fc
+  try { // uuid:738a345f
+    if (fs.existsSync(CONFIG_FILE)) { // uuid:38c7b5dc
+      config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8')); // uuid:b04387cc
+      console.log('Loaded configuration:', config); // uuid:0383b601
+    } // uuid:9e5dfa8c
+  } catch (error) { // uuid:05af0ca1
+    console.error('Error loading config:', error.message); // uuid:a3806065
+  } // uuid:afd2a706
+} // uuid:9b24b371
+// uuid:dce206f2
+function saveConfig() { // uuid:6caf4e0d
+  try { // uuid:43c07976
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2)); // uuid:5037ca27
+    console.log('Configuration saved.'); // uuid:2722b199
+  } catch (error) { // uuid:3f10fe99
+    console.error('Error saving config:', error.message); // uuid:46651acd
+  } // uuid:5ad0dd29
+} // uuid:503a4d83
+// uuid:d3f6c4a0
+function addUUIDsToFile(filePath) { // uuid:f5b91da4
+  try { // uuid:d67928fa
+    if (path.basename(filePath) === SCRIPT_FILENAME) { // uuid:6b52da11
+      console.log(`Skipping self: ${filePath}`); // uuid:054b2adf
+      return; // uuid:74fde258
+    } // uuid:16e42217
+// uuid:347a7a50
+    const { branch, lastCommit } = getGitInfo(); // uuid:be7aa28b
+    const timestamp = new Date().toISOString(); // uuid:2725334e
+// uuid:c3e7f882
+// uuid:fa033efb
+    let metaParts = []; // uuid:9ccdce1f
+    if (config.includeBranch && branch) metaParts.push(branch); // uuid:c0b74be9
+    if (config.includeCommit && lastCommit) metaParts.push(lastCommit); // uuid:e69afae8
+    if (config.includeTimestamp) metaParts.push(timestamp); // uuid:1aef0f18
+    const metaInfo = metaParts.join('|'); // uuid:e3918b19
+// uuid:129363cf
+    let content = fs.readFileSync(filePath, 'utf8'); // uuid:bbef3d24
+    const lines = content.split('\n'); // uuid:7db30eba
+// uuid:f19af3ce
+    const updatedLines = lines.map((line, index) => { // uuid:19b1bca2
+      const lineNumber = index + 1; // uuid:c2153cf7
+      let cleanLine = line; // uuid:4a24c84a
+// uuid:d12c8772
+      if (line.includes(' // uuid:b3cf7b21
+        cleanLine = line.substring(0, line.indexOf(' // uuid:b7a9fef1
+      } // uuid:79181cc0
+// uuid:f51a8c47
+      let comment = ' // uuid:cee6c0ef
+      if (metaInfo) comment += `${metaInfo} `; // uuid:7cc3a3e3
+      if (config.includeLineNumber) comment += `line:${lineNumber} `; // uuid:11c8d148
+      comment += `uuid:${generateShortUUID()}`; // uuid:adf5dfee
+// uuid:34a145ab
+      if (cleanLine.trim() === '') { // uuid:4463282d
+        return comment.trim(); // uuid:f5d95f8c
+      } // uuid:cabb477f
+// uuid:6769d927
+      return `${cleanLine.trimEnd()}${comment}`; // uuid:a0c9d684
+    }); // uuid:c2f85bf7
+// uuid:178a602b
+    fs.writeFileSync(filePath, updatedLines.join('\n')); // uuid:5c5e360d
+    console.log(`Updated: ${filePath}`); // uuid:77993bad
+  } catch (error) { // uuid:58ebc6ed
+    console.error(`Error processing ${filePath}: ${error.message}`); // uuid:805b74b2
+  } // uuid:272ca013
+} // uuid:8be2b3cc
+// uuid:fa4deb93
+function processDirectory(dirPath) { // uuid:ad59c3e2
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true }); // uuid:3e6ca90c
+// uuid:b1127e54
+  for (const entry of entries) { // uuid:1249ddf3
+    const fullPath = path.join(dirPath, entry.name); // uuid:14cf486d
+// uuid:b605dfa2
+    if (entry.isDirectory()) { // uuid:11016257
+      if (!SKIP_DIRS.includes(entry.name)) { // uuid:0146e20f
+        processDirectory(fullPath); // uuid:a5d53302
+      } // uuid:ca330290
+    } else if (entry.isFile() && /\.js$/.test(entry.name)) { // uuid:e2c3b9d5
+      addUUIDsToFile(fullPath); // uuid:49c1e04d
+    } // uuid:d3d34253
+  } // uuid:ea7e4671
+} // uuid:a411b400
+// uuid:57ae27a4
+function showMenu() { // uuid:0a92100d
+  const rl = readline.createInterface({ // uuid:c91b331a
+    input: process.stdin, // uuid:0e250ec4
+    output: process.stdout // uuid:48b9e396
+  }); // uuid:543fd474
+// uuid:d22fb6bf
+  console.log('\nUUID CLI Configuration:'); // uuid:6c2ef8f9
+  console.log('1. Include Branch Name: ' + (config.includeBranch ? 'Yes' : 'No')); // uuid:0a34a6e6
+  console.log('2. Include Last Commit: ' + (config.includeCommit ? 'Yes' : 'No')); // uuid:361016d4
+  console.log('3. Include Timestamp: ' + (config.includeTimestamp ? 'Yes' : 'No')); // uuid:251fb5ec
+  console.log('4. Include Line Numbers: ' + (config.includeLineNumber ? 'Yes' : 'No')); // uuid:d6557463
+  console.log('5. Reset to Defaults'); // uuid:49ca58fa
+  console.log('6. Save and Run'); // uuid:fceb12d5
+  console.log('7. Exit'); // uuid:08cf55f1
+// uuid:a9ae960c
+  rl.question('\nEnter option number: ', (answer) => { // uuid:d75c8b76
+    switch(answer) { // uuid:cd9d8cc5
+      case '1': // uuid:b4ecc975
+        config.includeBranch = !config.includeBranch; // uuid:7b37cb1e
+        rl.close(); // uuid:203f38bf
+        showMenu(); // uuid:3cb9c549
+        break; // uuid:30975377
+      case '2': // uuid:8bab159b
+        config.includeCommit = !config.includeCommit; // uuid:d014a2c5
+        rl.close(); // uuid:25b61dd5
+        showMenu(); // uuid:0fad4f42
+        break; // uuid:d175a03b
+      case '3': // uuid:c9dc9de4
+        config.includeTimestamp = !config.includeTimestamp; // uuid:58d7b832
+        rl.close(); // uuid:27083d72
+        showMenu(); // uuid:b108583d
+        break; // uuid:448c238c
+      case '4': // uuid:f92048ab
+        config.includeLineNumber = !config.includeLineNumber; // uuid:e0a364e6
+        rl.close(); // uuid:fac79b77
+        showMenu(); // uuid:a0febbf6
+        break; // uuid:b98aa6da
+      case '5': // uuid:779fddb5
+        config = { // uuid:59f8d35c
+          includeBranch: true, // uuid:d64f94bf
+          includeCommit: true, // uuid:53bb6379
+          includeTimestamp: true, // uuid:7789e67d
+          includeLineNumber: true // uuid:85240b96
+        }; // uuid:2b39c9f5
+        rl.close(); // uuid:a75ccded
+        showMenu(); // uuid:c3bf4190
+        break; // uuid:69b60131
+      case '6': // uuid:e9288120
+        saveConfig(); // uuid:138b8361
+        rl.close(); // uuid:da39cd99
+        processDirectory(process.cwd()); // uuid:6a513fbe
+        break; // uuid:a7e4e84d
+      case '7': // uuid:69d69797
+        console.log('Exiting without changes.'); // uuid:aa9f245b
+        rl.close(); // uuid:91e6e2f0
+        break; // uuid:a20ab7a5
+      default: // uuid:1c1a7f9b
+        console.log('Invalid option. Please try again.'); // uuid:c5c22c8b
+        rl.close(); // uuid:d46d2884
+        showMenu(); // uuid:a84bc36a
+    } // uuid:dbeafb6c
+  }); // uuid:30b13aa0
+} // uuid:fad32aeb
+// uuid:f7b744cf
+// uuid:31466110
+function main() { // uuid:090bf4ce
+  loadConfig(); // uuid:37fb7b62
+// uuid:fbb33569
+  if (process.argv.length > 2 && process.argv[2] === '--run') { // uuid:80b90f30
+// uuid:785716af
+    processDirectory(process.cwd()); // uuid:a53f66a8
+  } else { // uuid:3f4461a3
+// uuid:2dc3cf44
+    showMenu(); // uuid:2b63f456
+  } // uuid:102f9e12
+} // uuid:04ba9578
+// uuid:a9a89d00
+main(); // uuid:689c76a1
+// uuid:5f712fba

@@ -1,7 +1,12 @@
-// NEW VERSION - Original backed up to: orig.uuidd-cli.v1_2025-04-18_12-12.js 
+// Original file: uuidd-cli.js 
 // Version date: Fri Apr 18 12:12:42 PM EDT 2025 
 // Git branch: HEAD 
 // Last commit: test: rollback for default 
+
+// NEW VERSION - Original backed up to: orig.uuidd-cli_2025-04-18_12-06.js 
+// Version date: Fri Apr 18 12:06:26 PM EDT 2025 
+// Git branch: HEAD 
+// Last commit: feat: uuidd cli anhor testing 
 
 const fs = require('fs');
 const path = require('path');
@@ -13,6 +18,9 @@ const CONFIG_FILE = '.uuid-cli-config.json';
 const BACKUP_DIR = '.uuid-cli-backups';
 const SCRIPT_FILENAME = path.basename(__filename);
 const SKIP_DIRS = ['node_modules', 'dist', 'build', '.git', 'coverage', BACKUP_DIR];
+
+
+
 
 // Default configuration
 let config = {
@@ -35,22 +43,10 @@ function generateShortUUID() {
 function getGitInfo() {
   try {
     execSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' });
-    let branch;
-    
-    // Try to get branch from environment variable first
-    if (process.env.BRANCH_NAME) {
-      branch = process.env.BRANCH_NAME;
-    } else if (process.env.GIT_BRANCH) {
-      branch = process.env.GIT_BRANCH;
-    } else {
-      // Fall back to git command
-      branch = execSync('git branch --show-current', { encoding: 'utf8' }).trim();
-    }
-    
+    const branch = execSync('git branch --show-current', { encoding: 'utf8' }).trim();
     const lastCommit = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
     return { branch, lastCommit };
-  } catch (error) {
-    console.log('Git info detection error:', error.message);
+  } catch {
     return { branch: null, lastCommit: null };
   }
 }

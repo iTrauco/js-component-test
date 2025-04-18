@@ -1,44 +1,48 @@
 {
   "config": {
     "includeBranch": true,
-    "includeCommit": false,
-    "includeTimestamp": false,
-    "includeLineNumber": false
+    "includeCommit": true,
+    "includeTimestamp": true,
+    "includeLineNumber": true
   },
   "lastRun": {
-    "timestamp": 1744992698309,
+    "timestamp": 1744992839644,
     "files": [
       {
+        "relativePath": "artifacts/scripts/orig.uuidd-cli.v1_2025-04-18_12-12.js",
+        "backupPath": ".uuid-cli-backups/orig.uuidd-cli.v1_2025-04-18_12-12.js.1744992839549.bak"
+      },
+      {
         "relativePath": "artifacts/scripts/orig.uuidd-cli_2025-04-18_12-06.js",
-        "backupPath": ".uuid-cli-backups/orig.uuidd-cli_2025-04-18_12-06.js.1744992698214.bak"
+        "backupPath": ".uuid-cli-backups/orig.uuidd-cli_2025-04-18_12-06.js.1744992839567.bak"
       },
       {
         "relativePath": "server/server.js",
-        "backupPath": ".uuid-cli-backups/server.js.1744992698231.bak"
+        "backupPath": ".uuid-cli-backups/server.js.1744992839579.bak"
       },
       {
         "relativePath": "src/components/Button.js",
-        "backupPath": ".uuid-cli-backups/Button.js.1744992698245.bak"
+        "backupPath": ".uuid-cli-backups/Button.js.1744992839589.bak"
       },
       {
         "relativePath": "src/components/Modal.js",
-        "backupPath": ".uuid-cli-backups/Modal.js.1744992698255.bak"
+        "backupPath": ".uuid-cli-backups/Modal.js.1744992839598.bak"
       },
       {
         "relativePath": "src/components/Tooltip.js",
-        "backupPath": ".uuid-cli-backups/Tooltip.js.1744992698268.bak"
+        "backupPath": ".uuid-cli-backups/Tooltip.js.1744992839608.bak"
       },
       {
         "relativePath": "src/main.js",
-        "backupPath": ".uuid-cli-backups/main.js.1744992698278.bak"
+        "backupPath": ".uuid-cli-backups/main.js.1744992839616.bak"
       },
       {
         "relativePath": "src/utils/domUtils.js",
-        "backupPath": ".uuid-cli-backups/domUtils.js.1744992698290.bak"
+        "backupPath": ".uuid-cli-backups/domUtils.js.1744992839626.bak"
       },
       {
         "relativePath": "src/utils/eventBus.js",
-        "backupPath": ".uuid-cli-backups/eventBus.js.1744992698299.bak"
+        "backupPath": ".uuid-cli-backups/eventBus.js.1744992839635.bak"
       }
     ]
   }

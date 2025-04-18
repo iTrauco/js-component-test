@@ -1,12 +1,12 @@
-const express = require('express'); // uuid:7ca56b19
-const path = require('path'); // uuid:c22a2102
-const app = express(); // uuid:ad2a7878
-const PORT = 3000; // uuid:2b9753a3
-// uuid:87180571
-app.use(express.static(path.join(__dirname, '../public'))); // uuid:0031e25c
-app.use(express.static(path.join(__dirname, '../src'))); // uuid:8d17370b
-// uuid:bfb732a3
-app.listen(PORT, () => { // uuid:e3b54e38
-  console.log(`🚀 Server running at http://localhost:${PORT}`); // uuid:af0c963f
-}); // uuid:0e4cdeb6
-// uuid:99d13754
+const express = require('express'); // b129d2f|2025-04-18T16:13:59.589Z line:1 uuid:7438d5ae
+const path = require('path'); // b129d2f|2025-04-18T16:13:59.589Z line:2 uuid:878a96ef
+const app = express(); // b129d2f|2025-04-18T16:13:59.589Z line:3 uuid:acd54250
+const PORT = 3000; // b129d2f|2025-04-18T16:13:59.589Z line:4 uuid:42e3de94
+// b129d2f|2025-04-18T16:13:59.589Z line:5 uuid:8e60c729
+app.use(express.static(path.join(__dirname, '../public'))); // b129d2f|2025-04-18T16:13:59.589Z line:6 uuid:ad218a78
+app.use(express.static(path.join(__dirname, '../src'))); // b129d2f|2025-04-18T16:13:59.589Z line:7 uuid:f36bd080
+// b129d2f|2025-04-18T16:13:59.589Z line:8 uuid:914cd00f
+app.listen(PORT, () => { // b129d2f|2025-04-18T16:13:59.589Z line:9 uuid:c66b16a1
+  console.log(`🚀 Server running at http://localhost:${PORT}`); // b129d2f|2025-04-18T16:13:59.589Z line:10 uuid:bbf88567
+}); // b129d2f|2025-04-18T16:13:59.589Z line:11 uuid:49be8dcc
+// b129d2f|2025-04-18T16:13:59.589Z line:12 uuid:469cba5b

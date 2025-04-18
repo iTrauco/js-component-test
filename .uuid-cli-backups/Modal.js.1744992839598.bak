@@ -1,0 +1,4 @@
+export function showModal(message) { // uuid:97d4faa1
+  alert(message); // uuid:e7d40431
+} // uuid:15f8b716
+// uuid:a55300b6

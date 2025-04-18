@@ -1,0 +1,335 @@
+// uuid:e076535f
+// uuid:e89d369e
+// uuid:8d117284
+// uuid:10a0cd57
+// uuid:bc5bd273
+// uuid:4813b8e2
+// uuid:ebe77ea2
+// uuid:996217f9
+// uuid:93d7b118
+// uuid:2791f25f
+const fs = require('fs'); // uuid:3140be1f
+const path = require('path'); // uuid:ccbee033
+const crypto = require('crypto'); // uuid:3035ebf3
+const { execSync } = require('child_process'); // uuid:5481bd70
+const readline = require('readline'); // uuid:03791302
+// uuid:60762a23
+const CONFIG_FILE = '.uuid-cli-config.json'; // uuid:7cd50bc6
+const BACKUP_DIR = '.uuid-cli-backups'; // uuid:9a37ddc7
+const SCRIPT_FILENAME = path.basename(__filename); // uuid:7aa21573
+const SKIP_DIRS = ['node_modules', 'dist', 'build', '.git', 'coverage', BACKUP_DIR]; // uuid:861f8832
+// uuid:27a0161c
+// uuid:5ec04826
+// uuid:5d629ef5
+// uuid:0268717f
+// uuid:5fdfd081
+let config = { // uuid:cedece96
+  includeBranch: true, // uuid:49f54edc
+  includeCommit: true, // uuid:bd1be7c0
+  includeTimestamp: true, // uuid:066bc8f7
+  includeLineNumber: true // uuid:5feb1ea9
+}; // uuid:1b364728
+// uuid:9f445f58
+// uuid:0ff5d2da
+let lastRunInfo = { // uuid:7eafdbaa
+  timestamp: null, // uuid:eb3ecf10
+  files: [] // uuid:6328d825
+}; // uuid:a8df8e65
+// uuid:7f31821d
+function generateShortUUID() { // uuid:ee19cbd6
+  return crypto.randomBytes(4).toString('hex'); // uuid:4c1d509c
+} // uuid:381f0313
+// uuid:76eeda0b
+function getGitInfo() { // uuid:f99fbea8
+  try { // uuid:4362702d
+    execSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' }); // uuid:6adbc9de
+    const branch = execSync('git branch --show-current', { encoding: 'utf8' }).trim(); // uuid:2962c705
+    const lastCommit = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim(); // uuid:5ca1e381
+    return { branch, lastCommit }; // uuid:fc9cb377
+  } catch { // uuid:c66876eb
+    return { branch: null, lastCommit: null }; // uuid:211fbb18
+  } // uuid:b4a2d39c
+} // uuid:2b9d682b
+// uuid:6b7122bc
+function loadConfig() { // uuid:b1be25ab
+  try { // uuid:d0f90fff
+    if (fs.existsSync(CONFIG_FILE)) { // uuid:5ff8fa90
+      const fileContent = fs.readFileSync(CONFIG_FILE, 'utf8'); // uuid:fc6d1dea
+      const data = JSON.parse(fileContent); // uuid:c278866c
+// uuid:b6cb836f
+// uuid:4798eae5
+      if (data.config) { // uuid:6bf15345
+        config = data.config; // uuid:86048d8d
+      } // uuid:e8e41440
+// uuid:0e0f53e1
+// uuid:c5531cb7
+      if (data.lastRun) { // uuid:40c2d8be
+        lastRunInfo = data.lastRun; // uuid:16b2597c
+      } // uuid:bdbbe42d
+// uuid:0b01c854
+      console.log('Loaded configuration:', config); // uuid:d7383892
+    } // uuid:3b84b23d
+  } catch (error) { // uuid:694711dc
+    console.error('Error loading config:', error.message); // uuid:97a971aa
+  } // uuid:22281575
+} // uuid:f04f6f39
+// uuid:c6b8d366
+function saveConfig() { // uuid:1d0225c1
+  try { // uuid:afa946eb
+// uuid:de1801e5
+    const data = { // uuid:78e84a4d
+      config, // uuid:1e63f29c
+      lastRun: lastRunInfo // uuid:f515c475
+    }; // uuid:4c384738
+// uuid:ed3b05b4
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(data, null, 2)); // uuid:588c8aa6
+    console.log('Configuration saved.'); // uuid:1faf0e92
+  } catch (error) { // uuid:eb9e086a
+    console.error('Error saving config:', error.message); // uuid:a55a79cd
+  } // uuid:925fb698
+} // uuid:7b72c2c2
+// uuid:4a34c6df
+function ensureBackupDir() { // uuid:a4e91234
+  if (!fs.existsSync(BACKUP_DIR)) { // uuid:ed967862
+    fs.mkdirSync(BACKUP_DIR, { recursive: true }); // uuid:cc41147e
+    console.log(`Created backup directory: ${BACKUP_DIR}`); // uuid:e3f3261a
+  } // uuid:e17ce85a
+} // uuid:c460843c
+// uuid:22deda8e
+function backupFile(filePath) { // uuid:e9103ca6
+  try { // uuid:8385273a
+    ensureBackupDir(); // uuid:5b60b6e0
+// uuid:6e767596
+    const content = fs.readFileSync(filePath, 'utf8'); // uuid:0f667a35
+    const fileName = path.basename(filePath); // uuid:ba7897ce
+    const relativePath = path.relative(process.cwd(), filePath); // uuid:1d4d75d3
+    const backupPath = path.join(BACKUP_DIR, `${fileName}.${Date.now()}.bak`); // uuid:130696b6
+// uuid:c0c881bf
+    fs.writeFileSync(backupPath, content); // uuid:b8eda67e
+    return { relativePath, backupPath }; // uuid:dcb52c1c
+  } catch (error) { // uuid:0f40c45e
+    console.error(`Error backing up ${filePath}: ${error.message}`); // uuid:bab5ee6f
+    return null; // uuid:f889dc9a
+  } // uuid:5c5b6ae2
+} // uuid:5f007c96
+// uuid:789301e3
+function addUUIDsToFile(filePath) { // uuid:9a507c1e
+  try { // uuid:7b911401
+    if (path.basename(filePath) === SCRIPT_FILENAME) { // uuid:9f7f0e31
+      console.log(`Skipping self: ${filePath}`); // uuid:426eeb4e
+      return null; // uuid:73503844
+    } // uuid:3bec1535
+// uuid:5b2166c7
+// uuid:d8682682
+    const backup = backupFile(filePath); // uuid:51692953
+    if (!backup) return null; // uuid:d868fc88
+// uuid:4b23c3fb
+    const { branch, lastCommit } = getGitInfo(); // uuid:2f43a72c
+    const timestamp = new Date().toISOString(); // uuid:b2495c41
+// uuid:3ea65e2a
+// uuid:b23d1ceb
+    let metaParts = []; // uuid:92a13899
+    if (config.includeBranch && branch) metaParts.push(branch); // uuid:1aaf45ee
+    if (config.includeCommit && lastCommit) metaParts.push(lastCommit); // uuid:0001879a
+    if (config.includeTimestamp) metaParts.push(timestamp); // uuid:abc53df8
+    const metaInfo = metaParts.join('|'); // uuid:7531200e
+// uuid:1cc19cd5
+    let content = fs.readFileSync(filePath, 'utf8'); // uuid:eb7c7909
+    const lines = content.split('\n'); // uuid:c35476a2
+// uuid:a393d111
+    const updatedLines = lines.map((line, index) => { // uuid:0e06d7f8
+      const lineNumber = index + 1; // uuid:a34bdda7
+      let cleanLine = line; // uuid:f91870c9
+// uuid:39a4b306
+      if (line.includes(' // uuid:1042abb1
+        cleanLine = line.substring(0, line.indexOf(' // uuid:a6c4b292
+      } // uuid:d8d26e1b
+// uuid:b93c7cfb
+      let comment = ' // uuid:bb49ab5e
+      if (metaInfo) comment += `${metaInfo} `; // uuid:b7c370c2
+      if (config.includeLineNumber) comment += `line:${lineNumber} `; // uuid:430b5159
+      comment += `uuid:${generateShortUUID()}`; // uuid:015a834a
+// uuid:e052dd6f
+      if (cleanLine.trim() === '') { // uuid:f3712cbb
+        return comment.trim(); // uuid:8e08f724
+      } // uuid:7d98de26
+// uuid:4ea98a7d
+      return `${cleanLine.trimEnd()}${comment}`; // uuid:d7d3c8ef
+    }); // uuid:18a0f425
+// uuid:696aae47
+    fs.writeFileSync(filePath, updatedLines.join('\n')); // uuid:31675e1d
+    console.log(`Updated: ${filePath}`); // uuid:9dd8b34b
+// uuid:d8495067
+    return backup; // uuid:7d8457fb
+  } catch (error) { // uuid:6ceeb492
+    console.error(`Error processing ${filePath}: ${error.message}`); // uuid:29053380
+    return null; // uuid:95e63863
+  } // uuid:9cc197de
+} // uuid:8772d42d
+// uuid:0dbd5369
+function processDirectory(dirPath) { // uuid:91c326a2
+  const modifiedFiles = []; // uuid:c5d7d520
+  const entries = fs.readdirSync(dirPath, { withFileTypes: true }); // uuid:4fb74797
+// uuid:c4d474b1
+  for (const entry of entries) { // uuid:83025aa6
+    const fullPath = path.join(dirPath, entry.name); // uuid:d03966bd
+// uuid:5f697db3
+    if (entry.isDirectory()) { // uuid:d5f89418
+      if (!SKIP_DIRS.includes(entry.name)) { // uuid:3421359d
+        const subDirResults = processDirectory(fullPath); // uuid:79d26b09
+        modifiedFiles.push(...subDirResults); // uuid:798796a1
+      } // uuid:9f8f0992
+    } else if (entry.isFile() && /\.js$/.test(entry.name)) { // uuid:8ced376b
+      const result = addUUIDsToFile(fullPath); // uuid:c9e83079
+      if (result) { // uuid:1ab13d4b
+        modifiedFiles.push(result); // uuid:d869859d
+      } // uuid:bb4b4a5a
+    } // uuid:1faeb016
+  } // uuid:35d740dd
+// uuid:e48e2dcf
+  return modifiedFiles; // uuid:05e15441
+} // uuid:9f2998da
+// uuid:c147645d
+function rollbackLastRun() { // uuid:c9a3c563
+  if (!lastRunInfo.timestamp || lastRunInfo.files.length === 0) { // uuid:0ea095a8
+    console.log('No previous run found to rollback.'); // uuid:2a4ade98
+    return; // uuid:8e8eaaf2
+  } // uuid:46c92453
+// uuid:745c7c7e
+  console.log(`Rolling back run from ${new Date(lastRunInfo.timestamp).toLocaleString()}`); // uuid:920ee6d4
+  console.log(`Files to restore: ${lastRunInfo.files.length}`); // uuid:107bcded
+// uuid:54c07626
+  let successCount = 0; // uuid:efbcb584
+// uuid:1713baa8
+  for (const file of lastRunInfo.files) { // uuid:a37b0011
+    try { // uuid:9d75b446
+      if (fs.existsSync(file.backupPath)) { // uuid:d03b5c37
+        const backupContent = fs.readFileSync(file.backupPath, 'utf8'); // uuid:c4cdd34a
+        const targetPath = path.join(process.cwd(), file.relativePath); // uuid:bef9d8e9
+// uuid:2c2f81fe
+        fs.writeFileSync(targetPath, backupContent); // uuid:bedb67f3
+        console.log(`Restored: ${file.relativePath}`); // uuid:13af4a52
+        successCount++; // uuid:68dd715f
+      } else { // uuid:f66d933d
+        console.error(`Backup not found: ${file.backupPath}`); // uuid:12de61f0
+      } // uuid:0defa432
+    } catch (error) { // uuid:0b3a8f0d
+      console.error(`Error restoring ${file.relativePath}: ${error.message}`); // uuid:d9ba54f6
+    } // uuid:e6fa26ef
+  } // uuid:c6a90805
+// uuid:2aaea0b8
+  console.log(`Rollback completed. Restored ${successCount} of ${lastRunInfo.files.length} files.`); // uuid:6aeaf98c
+// uuid:f8e4c3d4
+// uuid:80b8813e
+  lastRunInfo = { // uuid:c166e0c8
+    timestamp: null, // uuid:ad0921f9
+    files: [] // uuid:73468988
+  }; // uuid:299601ba
+// uuid:19e8a774
+  saveConfig(); // uuid:3985c378
+} // uuid:0f31d242
+// uuid:509e90a0
+function runUUIDProcess() { // uuid:5429460a
+  const modifiedFiles = processDirectory(process.cwd()); // uuid:58bf40cb
+// uuid:b6b517bd
+// uuid:af6c2c46
+  lastRunInfo = { // uuid:f89c53d8
+    timestamp: Date.now(), // uuid:701a8a8f
+    files: modifiedFiles // uuid:66f96a65
+  }; // uuid:61ca7096
+// uuid:ff1f4a20
+  saveConfig(); // uuid:0fb73c88
+  console.log(`Run completed. Modified ${modifiedFiles.length} files.`); // uuid:4a6583f3
+} // uuid:e9b59b70
+// uuid:82e1c803
+function showMenu() { // uuid:2f03a4d3
+  const rl = readline.createInterface({ // uuid:dd8c9889
+    input: process.stdin, // uuid:9bcf5ec6
+    output: process.stdout // uuid:504dd395
+  }); // uuid:9a48a5db
+// uuid:dcce1d08
+  console.log('\nUUID CLI Configuration:'); // uuid:c9603ea9
+  console.log('1. Include Branch Name: ' + (config.includeBranch ? 'Yes' : 'No')); // uuid:20bde61f
+  console.log('2. Include Last Commit: ' + (config.includeCommit ? 'Yes' : 'No')); // uuid:9bca0353
+  console.log('3. Include Timestamp: ' + (config.includeTimestamp ? 'Yes' : 'No')); // uuid:20b4ead8
+  console.log('4. Include Line Numbers: ' + (config.includeLineNumber ? 'Yes' : 'No')); // uuid:558ae8fb
+  console.log('5. Reset to Defaults'); // uuid:957c80c9
+  console.log('6. Save and Run'); // uuid:bf04d1b9
+  console.log('7. Rollback Last Run'); // uuid:5016ca0e
+  console.log('8. Exit'); // uuid:d4bc81ae
+// uuid:49e120ed
+  rl.question('\nEnter option number: ', (answer) => { // uuid:7eca8173
+    switch(answer) { // uuid:3d487cf9
+      case '1': // uuid:d499847e
+        config.includeBranch = !config.includeBranch; // uuid:8e89f318
+        rl.close(); // uuid:05b96f03
+        showMenu(); // uuid:4b6828a1
+        break; // uuid:7bf85510
+      case '2': // uuid:acd62959
+        config.includeCommit = !config.includeCommit; // uuid:17f0c006
+        rl.close(); // uuid:22062b56
+        showMenu(); // uuid:3bcfb68b
+        break; // uuid:72612ce3
+      case '3': // uuid:80e472f8
+        config.includeTimestamp = !config.includeTimestamp; // uuid:50c56caa
+        rl.close(); // uuid:1be6b4a9
+        showMenu(); // uuid:8c28b38b
+        break; // uuid:c2a5f967
+      case '4': // uuid:5ef3f071
+        config.includeLineNumber = !config.includeLineNumber; // uuid:11ea46ad
+        rl.close(); // uuid:969a1a23
+        showMenu(); // uuid:089607d5
+        break; // uuid:a714b6cb
+      case '5': // uuid:ceba9ca0
+        config = { // uuid:44160023
+          includeBranch: true, // uuid:0344dfc2
+          includeCommit: true, // uuid:d98eb76d
+          includeTimestamp: true, // uuid:e5eeca57
+          includeLineNumber: true // uuid:0d00f1b1
+        }; // uuid:45096ceb
+        rl.close(); // uuid:10bf6eb8
+        showMenu(); // uuid:a08f944d
+        break; // uuid:20aefb4b
+      case '6': // uuid:ff2cd307
+        saveConfig(); // uuid:14f9d44d
+        rl.close(); // uuid:84501d60
+        runUUIDProcess(); // uuid:76303fa7
+        break; // uuid:5d6c0929
+      case '7': // uuid:e302974b
+        rl.close(); // uuid:c704a836
+        rollbackLastRun(); // uuid:6e9fa06d
+        showMenu(); // uuid:7236e3c6
+        break; // uuid:2f9c5ed6
+      case '8': // uuid:892ce927
+        console.log('Exiting without changes.'); // uuid:fbcccbaf
+        rl.close(); // uuid:87215acc
+        break; // uuid:fb3da3db
+      default: // uuid:134b0df1
+        console.log('Invalid option. Please try again.'); // uuid:68304188
+        rl.close(); // uuid:50086258
+        showMenu(); // uuid:b888ff78
+    } // uuid:eb7e8d63
+  }); // uuid:c7b6c6cf
+} // uuid:61177944
+// uuid:7beb8c15
+// uuid:b56e7083
+function main() { // uuid:5f9aabb8
+  loadConfig(); // uuid:23cfe60d
+// uuid:e7c09bd0
+  if (process.argv.length > 2) { // uuid:7a4030ab
+    if (process.argv[2] === '--run') { // uuid:1a83ce63
+// uuid:37464558
+      runUUIDProcess(); // uuid:d0c96f56
+    } else if (process.argv[2] === '--rollback') { // uuid:6a05f6c6
+// uuid:733ba6de
+      rollbackLastRun(); // uuid:2c695c9a
+    } else { // uuid:1c55eea6
+      console.log('Unknown command. Available commands: --run, --rollback'); // uuid:7b757067
+    } // uuid:745993aa
+  } else { // uuid:cee06651
+// uuid:0d06330c
+    showMenu(); // uuid:88ceb800
+  } // uuid:8ed076eb
+} // uuid:334cdfc0
+// uuid:4819051b
+main(); // uuid:b26b86ae

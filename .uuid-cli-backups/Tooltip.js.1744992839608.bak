@@ -1,0 +1,4 @@
+export function attachTooltip(el, text) { // uuid:d1719f1c
+  el.title = text; // uuid:db9a8bcf
+} // uuid:c2d7e650
+// uuid:da0f4489

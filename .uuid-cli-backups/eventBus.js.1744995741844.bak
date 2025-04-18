@@ -1,0 +1,11 @@
+const listeners = {}; // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.308Z line:1 uuid:ac8953dd
+// branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.308Z line:2 uuid:999300da
+export const eventBus = { // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.308Z line:3 uuid:d0b959ce
+  on(event, callback) { // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.308Z line:4 uuid:ba584b7e
+    (listeners[event] ||= []).push(callback); // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.308Z line:5 uuid:36e57cfe
+  }, // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.308Z line:6 uuid:9987bc00
+  emit(event, data) { // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.308Z line:7 uuid:cb159b07
+    (listeners[event] || []).forEach(cb => cb(data)); // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.308Z line:8 uuid:0f48d501
+  } // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.308Z line:9 uuid:79ce3bcb
+}; // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.308Z line:10 uuid:4d05f427
+// branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.308Z line:11 uuid:27b4cf2b

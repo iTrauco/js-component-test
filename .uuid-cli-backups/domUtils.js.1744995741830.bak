@@ -1,0 +1,4 @@
+export function getById(id) { // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.298Z line:1 uuid:f0535fa9
+  return document.getElementById(id); // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.298Z line:2 uuid:850e2dfd
+} // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.298Z line:3 uuid:0a58a25c
+// branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.298Z line:4 uuid:7c911b5b

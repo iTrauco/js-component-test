@@ -1,0 +1,4 @@
+export function showModal(message) { // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.268Z line:1 uuid:b472e9b4
+  alert(message); // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.268Z line:2 uuid:6532469b
+} // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.268Z line:3 uuid:e7dc343c
+// branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.268Z line:4 uuid:c091492c

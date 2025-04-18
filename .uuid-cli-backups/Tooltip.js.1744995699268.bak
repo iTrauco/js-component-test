@@ -1,0 +1,4 @@
+export function attachTooltip(el, text) { // time:2025-04-18T16:56:37.996Z uuid:44bffffa
+  el.title = text; // time:2025-04-18T16:56:37.996Z uuid:3cd53999
+} // time:2025-04-18T16:56:37.996Z uuid:e462d9b9
+// time:2025-04-18T16:56:37.996Z uuid:083a431f

@@ -1,0 +1,4 @@
+export function showModal(message) { // time:2025-04-18T16:56:37.986Z uuid:c6948ae1
+  alert(message); // time:2025-04-18T16:56:37.986Z uuid:dd0d2839
+} // time:2025-04-18T16:56:37.986Z uuid:604b2e2c
+// time:2025-04-18T16:56:37.986Z uuid:658de666

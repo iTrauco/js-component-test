@@ -1,0 +1,12 @@
+const express = require('express'); // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.247Z line:1 uuid:bb099f9b
+const path = require('path'); // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.247Z line:2 uuid:bcc2805d
+const app = express(); // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.247Z line:3 uuid:482e8eab
+const PORT = 3000; // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.247Z line:4 uuid:1e99f6a5
+// branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.247Z line:5 uuid:8983dd25
+app.use(express.static(path.join(__dirname, '../public'))); // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.247Z line:6 uuid:49bd03cf
+app.use(express.static(path.join(__dirname, '../src'))); // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.247Z line:7 uuid:c65d7234
+// branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.247Z line:8 uuid:475f1711
+app.listen(PORT, () => { // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.247Z line:9 uuid:2af99e1d
+  console.log(`🚀 Server running at http://localhost:${PORT}`); // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.247Z line:10 uuid:088399b7
+}); // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.247Z line:11 uuid:572780de
+// branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.247Z line:12 uuid:68602b35

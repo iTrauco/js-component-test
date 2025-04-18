@@ -1,0 +1,6 @@
+export function createButton(label) { // time:2025-04-18T16:56:37.974Z uuid:cb4e6692
+  const btn = document.createElement('button'); // time:2025-04-18T16:56:37.974Z uuid:89eb5b28
+  btn.textContent = label; // time:2025-04-18T16:56:37.974Z uuid:eaaede2f
+  return btn; // time:2025-04-18T16:56:37.974Z uuid:02c05602
+} // time:2025-04-18T16:56:37.974Z uuid:ec9b4c09
+// time:2025-04-18T16:56:37.974Z uuid:3be3b6c6

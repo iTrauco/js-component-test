@@ -1,0 +1,11 @@
+const listeners = {}; // time:2025-04-18T16:56:38.027Z uuid:900ba9e0
+// time:2025-04-18T16:56:38.027Z uuid:7c570215
+export const eventBus = { // time:2025-04-18T16:56:38.027Z uuid:80a1b27e
+  on(event, callback) { // time:2025-04-18T16:56:38.027Z uuid:5537858a
+    (listeners[event] ||= []).push(callback); // time:2025-04-18T16:56:38.027Z uuid:b281b7e1
+  }, // time:2025-04-18T16:56:38.027Z uuid:b13ceb0c
+  emit(event, data) { // time:2025-04-18T16:56:38.027Z uuid:4f8b9313
+    (listeners[event] || []).forEach(cb => cb(data)); // time:2025-04-18T16:56:38.027Z uuid:d874d8d4
+  } // time:2025-04-18T16:56:38.027Z uuid:48c3b293
+}; // time:2025-04-18T16:56:38.027Z uuid:70fea73a
+// time:2025-04-18T16:56:38.027Z uuid:bf0a93ad

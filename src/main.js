@@ -1,10 +1,10 @@
-import { getById } from './utils/domUtils.js'; // time:2025-04-18T16:51:26.036Z uuid:2411fce4
-import { showModal } from './components/Modal.js'; // time:2025-04-18T16:51:26.036Z uuid:d35c49e6
-// time:2025-04-18T16:51:26.036Z uuid:f39ebf5e
-document.addEventListener('DOMContentLoaded', () => { // time:2025-04-18T16:51:26.036Z uuid:75508293
-  const btn = getById('test-btn'); // time:2025-04-18T16:51:26.036Z uuid:eaadd976
-  btn.addEventListener('click', () => { // time:2025-04-18T16:51:26.036Z uuid:3723c172
-    showModal('Modal opened by Button!'); // time:2025-04-18T16:51:26.036Z uuid:e905693b
-  }); // time:2025-04-18T16:51:26.036Z uuid:98c43963
-}); // time:2025-04-18T16:51:26.036Z uuid:134e3957
-// time:2025-04-18T16:51:26.036Z uuid:dbb8db02
+import { getById } from './utils/domUtils.js'; // uuid:732a2948
+import { showModal } from './components/Modal.js'; // uuid:e78af3ec
+// uuid:90c4245d
+document.addEventListener('DOMContentLoaded', () => { // uuid:5ba4671f
+  const btn = getById('test-btn'); // uuid:36bade24
+  btn.addEventListener('click', () => { // uuid:8e7f1a00
+    showModal('Modal opened by Button!'); // uuid:82c2a979
+  }); // uuid:06070e4c
+}); // uuid:933276f7
+// uuid:2faa7843

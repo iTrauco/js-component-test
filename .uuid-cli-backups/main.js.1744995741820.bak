@@ -1,0 +1,10 @@
+import { getById } from './utils/domUtils.js'; // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.288Z line:1 uuid:cc684ec2
+import { showModal } from './components/Modal.js'; // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.288Z line:2 uuid:006752f9
+// branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.288Z line:3 uuid:df2aa4a8
+document.addEventListener('DOMContentLoaded', () => { // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.288Z line:4 uuid:c65771c7
+  const btn = getById('test-btn'); // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.288Z line:5 uuid:00844065
+  btn.addEventListener('click', () => { // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.288Z line:6 uuid:c4253e69
+    showModal('Modal opened by Button!'); // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.288Z line:7 uuid:22757c74
+  }); // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.288Z line:8 uuid:497e82e7
+}); // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.288Z line:9 uuid:e0a1b32f
+// branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.288Z line:10 uuid:ddc9da69

@@ -1,0 +1,10 @@
+import { getById } from './utils/domUtils.js'; // time:2025-04-18T16:56:38.006Z uuid:3f520af1
+import { showModal } from './components/Modal.js'; // time:2025-04-18T16:56:38.006Z uuid:a902b690
+// time:2025-04-18T16:56:38.006Z uuid:8cecfbd1
+document.addEventListener('DOMContentLoaded', () => { // time:2025-04-18T16:56:38.006Z uuid:a503c30c
+  const btn = getById('test-btn'); // time:2025-04-18T16:56:38.006Z uuid:afa8fa0e
+  btn.addEventListener('click', () => { // time:2025-04-18T16:56:38.006Z uuid:ed089c8f
+    showModal('Modal opened by Button!'); // time:2025-04-18T16:56:38.006Z uuid:e44fca2e
+  }); // time:2025-04-18T16:56:38.006Z uuid:08d26414
+}); // time:2025-04-18T16:56:38.006Z uuid:31b7ba1a
+// time:2025-04-18T16:56:38.006Z uuid:4cc8a3e9

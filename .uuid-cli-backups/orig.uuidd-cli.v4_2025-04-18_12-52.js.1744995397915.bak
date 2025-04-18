@@ -1,18 +1,12 @@
-function isInExcludedPath(fullPath) {
-  // Check if this path or any of its parent paths are in the excluded list
-  const relativePath = path.relative(process.cwd(), fullPath);
-  const pathParts = relativePath.split(path.sep);
-  
-  // Check if any directory in the path is excluded
-  for (let i = 0; i < pathParts.length; i++) {
-    if (config.excludeDirs.includes(pathParts[i])) {
-      return true;
-    }
-  }
-  
-  return false;
-}
+// Original file: uuidd-cli.js 
+// Version date: Fri Apr 18 12:52:51 PM EDT 2025 
+// Git branch: fix/uuidd-cli-script-ok 
+// Last commit: feat: using current version of script, branch n ame mnay not be needed 
 
+// NEW VERSION - Original backed up to: orig.uuidd-cli.v3_2025-04-18_12-16.js 
+// Version date: Fri Apr 18 12:16:24 PM EDT 2025 
+// Git branch: HEAD 
+// Last commit: test: branch name still absnt 
 
 const fs = require('fs');
 const path = require('path');
@@ -30,8 +24,7 @@ let config = {
   includeBranch: true,
   includeCommit: true,
   includeTimestamp: true,
-  includeLineNumber: true,
-  excludeDirs: [...SKIP_DIRS]
+  includeLineNumber: true
 };
 
 // Track the last run info
@@ -219,29 +212,15 @@ function addUUIDsToFile(filePath) {
 
 function processDirectory(dirPath) {
   const modifiedFiles = [];
-  
-  // Skip if this directory or any parent directory is excluded
-  if (isInExcludedPath(dirPath)) {
-    console.log(`Skipping excluded path: ${dirPath}`);
-    return modifiedFiles;
-  }
-  
   const entries = fs.readdirSync(dirPath, { withFileTypes: true });
-  
-  // Initialize excludeDirs if undefined
-  if (!config.excludeDirs) {
-    config.excludeDirs = [...SKIP_DIRS];
-  }
   
   for (const entry of entries) {
     const fullPath = path.join(dirPath, entry.name);
     
     if (entry.isDirectory()) {
-      if (!config.excludeDirs.includes(entry.name)) {
+      if (!SKIP_DIRS.includes(entry.name)) {
         const subDirResults = processDirectory(fullPath);
         modifiedFiles.push(...subDirResults);
-      } else {
-        console.log(`Skipping excluded directory: ${entry.name}`);
       }
     } else if (entry.isFile() && /\.js$/.test(entry.name)) {
       const result = addUUIDsToFile(fullPath);
@@ -317,11 +296,10 @@ function showMenu() {
   console.log('2. Include Last Commit: ' + (config.includeCommit ? 'Yes' : 'No'));
   console.log('3. Include Timestamp: ' + (config.includeTimestamp ? 'Yes' : 'No'));
   console.log('4. Include Line Numbers: ' + (config.includeLineNumber ? 'Yes' : 'No'));
-  console.log('5. Manage Excluded Directories');
-  console.log('6. Reset to Defaults');
-  console.log('7. Save and Run');
-  console.log('8. Rollback Last Run');
-  console.log('9. Exit');
+  console.log('5. Reset to Defaults');
+  console.log('6. Save and Run');
+  console.log('7. Rollback Last Run');
+  console.log('8. Exit');
   
   rl.question('\nEnter option number: ', (answer) => {
     switch(answer) {
@@ -346,31 +324,26 @@ function showMenu() {
         showMenu();
         break;
       case '5':
-        rl.close();
-        showDirectoryMenu();
-        break;
-      case '6':
         config = {
           includeBranch: true,
           includeCommit: true,
           includeTimestamp: true,
-          includeLineNumber: true,
-          excludeDirs: [...SKIP_DIRS]
+          includeLineNumber: true
         };
         rl.close();
         showMenu();
         break;
-      case '7':
+      case '6':
         saveConfig();
         rl.close();
         runUUIDProcess();
         break;
-      case '8':
+      case '7':
         rl.close();
         rollbackLastRun();
         showMenu();
         break;
-      case '9':
+      case '8':
         console.log('Exiting without changes.');
         rl.close();
         break;
@@ -382,125 +355,9 @@ function showMenu() {
   });
 }
 
-function showDirectoryMenu() {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-  
-  console.log('\nExcluded Directories Management:');
-  console.log('Currently excluded:');
-  
-  // Initialize excludeDirs if undefined
-  if (!config.excludeDirs) {
-    config.excludeDirs = [...SKIP_DIRS];
-  }
-  
-  if (config.excludeDirs.length === 0) {
-    console.log('No directories excluded.');
-  } else {
-    config.excludeDirs.forEach((dir, index) => {
-      console.log(`${index + 1}. ${dir}`);
-    });
-  }
-  
-  console.log('\nOptions:');
-  console.log('1. Add directory to exclude');
-  console.log('2. Remove directory from exclude list');
-  console.log('3. Back to main menu');
-  
-  rl.question('\nEnter option number: ', (answer) => {
-    rl.close();
-    
-    switch(answer) {
-      case '1':
-        addExcludeDirectory();
-        break;
-      case '2':
-        removeExcludeDirectory();
-        break;
-      case '3':
-        showMenu();
-        break;
-      default:
-        console.log('Invalid option. Please try again.');
-        showDirectoryMenu();
-    }
-  });
-}
-
-function addExcludeDirectory() {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-  
-  rl.question('Enter directory name to exclude: ', (dir) => {
-    if (dir && dir.trim()) {
-      const trimmedDir = dir.trim();
-      
-      if (!config.excludeDirs.includes(trimmedDir)) {
-        config.excludeDirs.push(trimmedDir);
-        console.log(`Added "${trimmedDir}" to exclude list.`);
-      } else {
-        console.log(`"${trimmedDir}" is already in the exclude list.`);
-      }
-    }
-    
-    rl.close();
-    showDirectoryMenu();
-  });
-}
-
-function removeExcludeDirectory() {
-  if (config.excludeDirs.length === 0) {
-    console.log('No directories to remove.');
-    showDirectoryMenu();
-    return;
-  }
-  
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-  
-  rl.question('Enter number of directory to remove (or 0 to cancel): ', (input) => {
-    const index = parseInt(input, 10) - 1;
-    
-    if (index === -1) {
-      // User entered 0, cancel
-      rl.close();
-      showDirectoryMenu();
-      return;
-    }
-    
-    if (isNaN(index) || index < 0 || index >= config.excludeDirs.length) {
-      console.log('Invalid number. Please try again.');
-    } else {
-      const removedDir = config.excludeDirs[index];
-      
-      // Don't allow removing built-in directories
-      if (SKIP_DIRS.includes(removedDir)) {
-        console.log(`Cannot remove built-in excluded directory "${removedDir}".`);
-      } else {
-        config.excludeDirs.splice(index, 1);
-        console.log(`Removed "${removedDir}" from exclude list.`);
-      }
-    }
-    
-    rl.close();
-    showDirectoryMenu();
-  });
-}
-
 // Main entry point
 function main() {
   loadConfig();
-  
-  // Initialize excludeDirs if undefined
-  if (!config.excludeDirs) {
-    config.excludeDirs = [...SKIP_DIRS];
-  }
   
   if (process.argv.length > 2) {
     if (process.argv[2] === '--run') {
@@ -509,22 +366,8 @@ function main() {
     } else if (process.argv[2] === '--rollback') {
       // Direct rollback mode
       rollbackLastRun();
-    } else if (process.argv[2] === '--exclude' && process.argv.length > 3) {
-      // Add directory to exclude list
-      const dir = process.argv[3].trim();
-      if (dir && !config.excludeDirs.includes(dir)) {
-        config.excludeDirs.push(dir);
-        console.log(`Added "${dir}" to exclude list.`);
-        saveConfig();
-      } else {
-        console.log(`"${dir}" is already in exclude list or invalid.`);
-      }
-    } else if (process.argv[2] === '--list-exclude') {
-      // List excluded directories
-      console.log('Excluded directories:');
-      config.excludeDirs.forEach(dir => console.log(`- ${dir}`));
     } else {
-      console.log('Unknown command. Available commands: --run, --rollback, --exclude <dir>, --list-exclude');
+      console.log('Unknown command. Available commands: --run, --rollback');
     }
   } else {
     // Interactive mode

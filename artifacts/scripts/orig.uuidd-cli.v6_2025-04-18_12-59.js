@@ -1,18 +1,12 @@
-function isInExcludedPath(fullPath) {
-  // Check if this path or any of its parent paths are in the excluded list
-  const relativePath = path.relative(process.cwd(), fullPath);
-  const pathParts = relativePath.split(path.sep);
-  
-  // Check if any directory in the path is excluded
-  for (let i = 0; i < pathParts.length; i++) {
-    if (config.excludeDirs.includes(pathParts[i])) {
-      return true;
-    }
-  }
-  
-  return false;
-}
+// Original file: uuidd-cli.js 
+// Version date: Fri Apr 18 12:59:43 PM EDT 2025 
+// Git branch: fix/uuidd-cli-script-ok 
+// Last commit: test: bug in script, reworking 
 
+// NEW VERSION - Original backed up to: orig.uuidd-cli.v5_2025-04-18_12-55.js 
+// Version date: Fri Apr 18 12:55:07 PM EDT 2025 
+// Git branch: fix/uuidd-cli-script-ok 
+// Last commit: enhancing script with directory exclusion logic stored in state config 
 
 const fs = require('fs');
 const path = require('path');
@@ -219,13 +213,6 @@ function addUUIDsToFile(filePath) {
 
 function processDirectory(dirPath) {
   const modifiedFiles = [];
-  
-  // Skip if this directory or any parent directory is excluded
-  if (isInExcludedPath(dirPath)) {
-    console.log(`Skipping excluded path: ${dirPath}`);
-    return modifiedFiles;
-  }
-  
   const entries = fs.readdirSync(dirPath, { withFileTypes: true });
   
   // Initialize excludeDirs if undefined
@@ -240,8 +227,6 @@ function processDirectory(dirPath) {
       if (!config.excludeDirs.includes(entry.name)) {
         const subDirResults = processDirectory(fullPath);
         modifiedFiles.push(...subDirResults);
-      } else {
-        console.log(`Skipping excluded directory: ${entry.name}`);
       }
     } else if (entry.isFile() && /\.js$/.test(entry.name)) {
       const result = addUUIDsToFile(fullPath);

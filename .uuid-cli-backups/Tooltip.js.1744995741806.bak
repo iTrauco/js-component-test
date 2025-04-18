@@ -1,0 +1,4 @@
+export function attachTooltip(el, text) { // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.277Z line:1 uuid:8b472913
+  el.title = text; // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.277Z line:2 uuid:7193750a
+} // branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.277Z line:3 uuid:c21ead24
+// branch:fix/uuidd-cli-script-ok|commit:2c78d12|time:2025-04-18T17:01:39.277Z line:4 uuid:1638bde0

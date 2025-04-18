@@ -2,55 +2,48 @@
   "config": {
     "includeBranch": false,
     "includeCommit": false,
-    "includeTimestamp": true,
-    "includeLineNumber": false
+    "includeTimestamp": false,
+    "includeLineNumber": false,
+    "excludeDirs": [
+      "node_modules",
+      "dist",
+      "build",
+      ".git",
+      "coverage",
+      ".uuid-cli-backups",
+      "artifacts"
+    ]
   },
   "lastRun": {
-    "timestamp": 1744995086056,
+    "timestamp": 1744995741855,
     "files": [
       {
-        "relativePath": "artifacts/scripts/orig.uuidd-cli.v1_2025-04-18_12-12.js",
-        "backupPath": ".uuid-cli-backups/orig.uuidd-cli.v1_2025-04-18_12-12.js.1744995085923.bak"
-      },
-      {
-        "relativePath": "artifacts/scripts/orig.uuidd-cli.v2_2025-04-18_12-14.js",
-        "backupPath": ".uuid-cli-backups/orig.uuidd-cli.v2_2025-04-18_12-14.js.1744995085943.bak"
-      },
-      {
-        "relativePath": "artifacts/scripts/orig.uuidd-cli.v3_2025-04-18_12-16.js",
-        "backupPath": ".uuid-cli-backups/orig.uuidd-cli.v3_2025-04-18_12-16.js.1744995085956.bak"
-      },
-      {
-        "relativePath": "artifacts/scripts/orig.uuidd-cli_2025-04-18_12-06.js",
-        "backupPath": ".uuid-cli-backups/orig.uuidd-cli_2025-04-18_12-06.js.1744995085967.bak"
-      },
-      {
         "relativePath": "server/server.js",
-        "backupPath": ".uuid-cli-backups/server.js.1744995085979.bak"
+        "backupPath": ".uuid-cli-backups/server.js.1744995741765.bak"
       },
       {
         "relativePath": "src/components/Button.js",
-        "backupPath": ".uuid-cli-backups/Button.js.1744995085992.bak"
+        "backupPath": ".uuid-cli-backups/Button.js.1744995741783.bak"
       },
       {
         "relativePath": "src/components/Modal.js",
-        "backupPath": ".uuid-cli-backups/Modal.js.1744995086004.bak"
+        "backupPath": ".uuid-cli-backups/Modal.js.1744995741796.bak"
       },
       {
         "relativePath": "src/components/Tooltip.js",
-        "backupPath": ".uuid-cli-backups/Tooltip.js.1744995086016.bak"
+        "backupPath": ".uuid-cli-backups/Tooltip.js.1744995741806.bak"
       },
       {
         "relativePath": "src/main.js",
-        "backupPath": ".uuid-cli-backups/main.js.1744995086027.bak"
+        "backupPath": ".uuid-cli-backups/main.js.1744995741820.bak"
       },
       {
         "relativePath": "src/utils/domUtils.js",
-        "backupPath": ".uuid-cli-backups/domUtils.js.1744995086037.bak"
+        "backupPath": ".uuid-cli-backups/domUtils.js.1744995741830.bak"
       },
       {
         "relativePath": "src/utils/eventBus.js",
-        "backupPath": ".uuid-cli-backups/eventBus.js.1744995086047.bak"
+        "backupPath": ".uuid-cli-backups/eventBus.js.1744995741844.bak"
       }
     ]
   }

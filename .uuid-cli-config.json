@@ -6,40 +6,7 @@
     "includeLineNumber": false
   },
   "lastRun": {
-    "timestamp": 1744992613722,
-    "files": [
-      {
-        "relativePath": "artifacts/scripts/orig.uuidd-cli_2025-04-18_12-06.js",
-        "backupPath": ".uuid-cli-backups/orig.uuidd-cli_2025-04-18_12-06.js.1744992613625.bak"
-      },
-      {
-        "relativePath": "server/server.js",
-        "backupPath": ".uuid-cli-backups/server.js.1744992613643.bak"
-      },
-      {
-        "relativePath": "src/components/Button.js",
-        "backupPath": ".uuid-cli-backups/Button.js.1744992613654.bak"
-      },
-      {
-        "relativePath": "src/components/Modal.js",
-        "backupPath": ".uuid-cli-backups/Modal.js.1744992613665.bak"
-      },
-      {
-        "relativePath": "src/components/Tooltip.js",
-        "backupPath": ".uuid-cli-backups/Tooltip.js.1744992613677.bak"
-      },
-      {
-        "relativePath": "src/main.js",
-        "backupPath": ".uuid-cli-backups/main.js.1744992613686.bak"
-      },
-      {
-        "relativePath": "src/utils/domUtils.js",
-        "backupPath": ".uuid-cli-backups/domUtils.js.1744992613700.bak"
-      },
-      {
-        "relativePath": "src/utils/eventBus.js",
-        "backupPath": ".uuid-cli-backups/eventBus.js.1744992613711.bak"
-      }
-    ]
+    "timestamp": null,
+    "files": []
   }
 }

@@ -1,10 +1,10 @@
-import { getById } from './utils/domUtils.js'; // time:2025-04-18T16:18:04.460Z line:1 uuid:ce5ceb85
-import { showModal } from './components/Modal.js'; // time:2025-04-18T16:18:04.460Z line:2 uuid:364e81de
-// time:2025-04-18T16:18:04.460Z line:3 uuid:6000ab30
-document.addEventListener('DOMContentLoaded', () => { // time:2025-04-18T16:18:04.460Z line:4 uuid:721317ac
-  const btn = getById('test-btn'); // time:2025-04-18T16:18:04.460Z line:5 uuid:8808c27c
-  btn.addEventListener('click', () => { // time:2025-04-18T16:18:04.460Z line:6 uuid:491cf457
-    showModal('Modal opened by Button!'); // time:2025-04-18T16:18:04.460Z line:7 uuid:4aea3d0b
-  }); // time:2025-04-18T16:18:04.460Z line:8 uuid:62438707
-}); // time:2025-04-18T16:18:04.460Z line:9 uuid:ea752a1b
-// time:2025-04-18T16:18:04.460Z line:10 uuid:1fe642dc
+import { getById } from './utils/domUtils.js'; // time:2025-04-18T16:51:26.036Z uuid:2411fce4
+import { showModal } from './components/Modal.js'; // time:2025-04-18T16:51:26.036Z uuid:d35c49e6
+// time:2025-04-18T16:51:26.036Z uuid:f39ebf5e
+document.addEventListener('DOMContentLoaded', () => { // time:2025-04-18T16:51:26.036Z uuid:75508293
+  const btn = getById('test-btn'); // time:2025-04-18T16:51:26.036Z uuid:eaadd976
+  btn.addEventListener('click', () => { // time:2025-04-18T16:51:26.036Z uuid:3723c172
+    showModal('Modal opened by Button!'); // time:2025-04-18T16:51:26.036Z uuid:e905693b
+  }); // time:2025-04-18T16:51:26.036Z uuid:98c43963
+}); // time:2025-04-18T16:51:26.036Z uuid:134e3957
+// time:2025-04-18T16:51:26.036Z uuid:dbb8db02

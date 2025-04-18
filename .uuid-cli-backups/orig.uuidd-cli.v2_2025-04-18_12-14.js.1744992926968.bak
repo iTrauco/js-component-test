@@ -1,7 +1,12 @@
-// NEW VERSION - Original backed up to: orig.uuidd-cli.v2_2025-04-18_12-14.js 
+// Original file: uuidd-cli.js 
 // Version date: Fri Apr 18 12:15:00 PM EDT 2025 
 // Git branch: HEAD 
 // Last commit: test: branch still missing commit hash present 
+
+// NEW VERSION - Original backed up to: orig.uuidd-cli.v1_2025-04-18_12-12.js 
+// Version date: Fri Apr 18 12:12:42 PM EDT 2025 
+// Git branch: HEAD 
+// Last commit: test: rollback for default 
 
 const fs = require('fs');
 const path = require('path');
@@ -43,21 +48,8 @@ function getGitInfo() {
     } else if (process.env.GIT_BRANCH) {
       branch = process.env.GIT_BRANCH;
     } else {
-      // Fall back to git command - try multiple methods
-      try {
-        branch = execSync('git branch --show-current', { encoding: 'utf8' }).trim();
-        
-        // If branch is empty, try alternative command
-        if (!branch) {
-          const gitStatusOutput = execSync('git status', { encoding: 'utf8' });
-          const branchMatch = gitStatusOutput.match(/On branch ([^\s]+)/);
-          if (branchMatch && branchMatch[1]) {
-            branch = branchMatch[1];
-          }
-        }
-      } catch (branchError) {
-        console.log('Error getting branch name:', branchError.message);
-      }
+      // Fall back to git command
+      branch = execSync('git branch --show-current', { encoding: 'utf8' }).trim();
     }
     
     const lastCommit = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
@@ -144,14 +136,11 @@ function addUUIDsToFile(filePath) {
     const { branch, lastCommit } = getGitInfo();
     const timestamp = new Date().toISOString();
     
-    // Debug log for git info
-    console.log(`Git info for ${filePath}: branch=${branch}, commit=${lastCommit}`);
-    
     // Build meta info string based on config
     let metaParts = [];
-    if (config.includeBranch && branch) metaParts.push(`branch:${branch}`);
-    if (config.includeCommit && lastCommit) metaParts.push(`commit:${lastCommit}`);
-    if (config.includeTimestamp) metaParts.push(`time:${timestamp}`);
+    if (config.includeBranch && branch) metaParts.push(branch);
+    if (config.includeCommit && lastCommit) metaParts.push(lastCommit);
+    if (config.includeTimestamp) metaParts.push(timestamp);
     const metaInfo = metaParts.join('|');
     
     let content = fs.readFileSync(filePath, 'utf8');

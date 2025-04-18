@@ -1,12 +1,45 @@
 {
   "config": {
-    "includeBranch": false,
+    "includeBranch": true,
     "includeCommit": false,
     "includeTimestamp": false,
     "includeLineNumber": false
   },
   "lastRun": {
-    "timestamp": null,
-    "files": []
+    "timestamp": 1744992698309,
+    "files": [
+      {
+        "relativePath": "artifacts/scripts/orig.uuidd-cli_2025-04-18_12-06.js",
+        "backupPath": ".uuid-cli-backups/orig.uuidd-cli_2025-04-18_12-06.js.1744992698214.bak"
+      },
+      {
+        "relativePath": "server/server.js",
+        "backupPath": ".uuid-cli-backups/server.js.1744992698231.bak"
+      },
+      {
+        "relativePath": "src/components/Button.js",
+        "backupPath": ".uuid-cli-backups/Button.js.1744992698245.bak"
+      },
+      {
+        "relativePath": "src/components/Modal.js",
+        "backupPath": ".uuid-cli-backups/Modal.js.1744992698255.bak"
+      },
+      {
+        "relativePath": "src/components/Tooltip.js",
+        "backupPath": ".uuid-cli-backups/Tooltip.js.1744992698268.bak"
+      },
+      {
+        "relativePath": "src/main.js",
+        "backupPath": ".uuid-cli-backups/main.js.1744992698278.bak"
+      },
+      {
+        "relativePath": "src/utils/domUtils.js",
+        "backupPath": ".uuid-cli-backups/domUtils.js.1744992698290.bak"
+      },
+      {
+        "relativePath": "src/utils/eventBus.js",
+        "backupPath": ".uuid-cli-backups/eventBus.js.1744992698299.bak"
+      }
+    ]
   }
 }

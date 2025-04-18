@@ -1,0 +1,6 @@
+{
+  "includeBranch": true,
+  "includeCommit": true,
+  "includeTimestamp": true,
+  "includeLineNumber": true
+}

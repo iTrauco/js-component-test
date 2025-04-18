@@ -1,48 +1,12 @@
-# NEW VERSION - Original backed up to: orig.git_timemachine_2025-04-18_12-26.sh 
+# Original file: git_timemachine.sh 
 # Version date: Fri Apr 18 12:26:29 PM EDT 2025 
 # Git branch: feat/git-time-machine 
 # Last commit: test: script requires ability to navigate recurseively between local branches and then commit states 
-# Function to list available branches
-list_branches() {
-    echo "Available branches:"
-    echo "================="
-    
-    current_displayed_branch=$(git branch --show-current)
-    
-    # Use git branch to show branches with current indicator
-    git branch | while read branch_line; do
-        if echo "$branch_line" | grep -q "^\*"; then
-            # Current branch
-            echo "$branch_line"
-        else
-            echo "$branch_line"
-        fi
-    done
-    
-    echo "================="
-}
 
-# Function to switch to a different branch
-switch_branch() {
-    branch_name=$1
-    
-    # Check if branch exists
-    if ! git show-ref --verify --quiet refs/heads/"$branch_name"; then
-        echo "Error: Branch '$branch_name' does not exist!"
-        return 1
-    fi
-    
-    echo "Switching to branch: $branch_name"
-    git checkout "$branch_name" --quiet
-    CURRENT_BRANCH="$branch_name"
-    
-    # Reload commits for this branch
-    load_commits "$CURRENT_BRANCH"
-    list_commits
-}#!/bin/sh
+#!/bin/sh
 
-# Git Time Machine - Navigate between branches and commits
-# Save as git_timemachine.sh and make executable with:
+# Git Time Machine - Navigate between commits easily
+# Save as git-timemachine or git_timemachine.sh and make executable with:
 # chmod +x git_timemachine.sh
 
 # Initialize variables
@@ -51,32 +15,27 @@ COMMIT_DATES=""
 COMMIT_MSGS=""
 CURRENT_INDEX=-1
 BRANCH=""
-CURRENT_BRANCH=""
-ORIGINAL_BRANCH=""
 ORIGINAL_POSITION=""
 LIMIT=10
-BRANCH_LIST=""
 
 # Function to display help message
 show_help() {
-    echo "Git Time Machine - Navigate between branches and commits"
+    echo "Git Time Machine - Navigate between commits easily"
     echo ""
     echo "Usage: $0 [options]"
     echo ""
     echo "Options:"
-    echo "  -b, --branch <branch>   Specify which branch to start with (default: current branch)"
-    echo "  -n, --number <number>   Number of recent commits to load per branch (default: 10)"
+    echo "  -b, --branch <branch>   Specify which branch to use (default: current branch)"
+    echo "  -n, --number <number>   Number of recent commits to load (default: 10)"
     echo "  -h, --help              Show this help message"
     echo ""
     echo "Navigation Commands:"
     echo "  n, next      - Move to newer commit"
     echo "  p, prev      - Move to older commit"
     echo "  g, goto <n>  - Go to specific commit number"
-    echo "  l, list      - List available commits in current branch"
+    echo "  l, list      - List available commits"
     echo "  c, current   - Show current position"
     echo "  r, return    - Return to original position"
-    echo "  b, branches  - List available branches"
-    echo "  s, switch <branch> - Switch to different branch"
     echo "  q, quit      - Exit the time machine"
     echo ""
 }
@@ -89,32 +48,17 @@ check_git_repo() {
     fi
 }
 
-# Function to load branches
-load_branches() {
-    echo "Loading branches..."
-    BRANCH_LIST=$(git branch | sed 's/^[ *]*//' | tr '\n' ' ')
-    
-    # Save original branch
-    ORIGINAL_BRANCH=$(git branch --show-current)
-    CURRENT_BRANCH=$ORIGINAL_BRANCH
-    
-    echo "Available branches: $BRANCH_LIST"
-    echo "Current branch: $CURRENT_BRANCH"
-}
-
-# Function to load commit history for a branch
+# Function to load commit history
 load_commits() {
-    branch_name=$1
-    if [ -z "$branch_name" ]; then
-        branch_name=$CURRENT_BRANCH
-    fi
+    # Save original position
+    ORIGINAL_POSITION=$(git rev-parse HEAD)
     
-    echo "Loading commits for branch: $branch_name"
+    echo "Loading commit history..."
     
     # Store the commits in temporary files to avoid subshell issues
-    git log --pretty=format:"%H" --date=short -n "$LIMIT" "$branch_name" > /tmp/git_tm_hashes.txt
-    git log --pretty=format:"%ad" --date=short -n "$LIMIT" "$branch_name" > /tmp/git_tm_dates.txt
-    git log --pretty=format:"%s" --date=short -n "$LIMIT" "$branch_name" > /tmp/git_tm_msgs.txt
+    git log --pretty=format:"%H" --date=short -n "$LIMIT" $BRANCH > /tmp/git_tm_hashes.txt
+    git log --pretty=format:"%ad" --date=short -n "$LIMIT" $BRANCH > /tmp/git_tm_dates.txt
+    git log --pretty=format:"%s" --date=short -n "$LIMIT" $BRANCH > /tmp/git_tm_msgs.txt
     
     # Read the files
     COMMIT_LIST=$(cat /tmp/git_tm_hashes.txt | tr '\n' ' ')
@@ -126,16 +70,6 @@ load_commits() {
     
     # Set current position to the most recent commit
     CURRENT_INDEX=1
-}
-
-# Function to initialize the time machine
-initialize() {
-    # Save original position
-    ORIGINAL_POSITION=$(git rev-parse HEAD)
-    
-    # Load branches and commits
-    load_branches
-    load_commits "$CURRENT_BRANCH"
 }
 
 # Function to get commit hash by index
@@ -274,13 +208,13 @@ done
 
 # Main program
 check_git_repo
-initialize
+load_commits
 list_commits
 
 # Interactive loop
 while true; do
     echo ""
-    echo "Enter command (n=next, p=prev, g=goto, l=list, c=current, r=return, b=branches, s=switch, q=quit):"
+    echo "Enter command (n=next, p=prev, g=goto, l=list, c=current, r=return, q=quit):"
     read command args
     
     case "$command" in
@@ -298,26 +232,17 @@ while true; do
             ;;
         c|current)
             show_current
-            echo "Current branch: $CURRENT_BRANCH"
             ;;
         r|return)
             return_to_original
             ;;
-        b|branches)
-            list_branches
-            ;;
-        s|switch)
-            switch_branch "$args"
-            ;;
         q|quit)
             echo "Exiting Git Time Machine..."
-            # Return to original position and branch
-            git checkout "$ORIGINAL_BRANCH" --quiet
-            git checkout "$ORIGINAL_POSITION" --quiet
+            return_to_original
             exit 0
             ;;
         *)
-            echo "Unknown command. Type 'l' to list commits, 'b' to list branches, 'q' to quit."
+            echo "Unknown command. Type 'l' to list commits, 'q' to quit."
             ;;
     esac
 done

@@ -30,7 +30,7 @@ body {
 EOF
 
 # 🌐 Basic Express Server
-cat > "$PROJECT_NAME/server/server.js" << 'EOF'
+cat > "$PROJECT_NAME/server/server.js" << EOF
 const express = require('express');
 const path = require('path');
 const app = express();
